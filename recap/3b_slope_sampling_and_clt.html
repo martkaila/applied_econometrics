@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3b · One Sample, One Slope — Econometrics Recap</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:#1c2330;line-height:1.5;
+       background:radial-gradient(1100px 520px at 85% -8%,#e8efff 0%,rgba(232,239,255,0) 60%),
+                  radial-gradient(900px 500px at -10% 110%,#fdf3e4 0%,rgba(253,243,228,0) 55%),#f6f6f3}
+  .wrap{max-width:1180px;margin:0 auto;padding:22px 20px 60px}
+  nav a{color:#2563eb;text-decoration:none;font-size:14px}
+  nav a:hover{text-decoration:underline}
+  .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#2563eb;font-weight:600;margin-top:8px}
+  h1{font-size:30px;margin:2px 0 6px;letter-spacing:-.01em}
+  .sub{color:#5b6472;max-width:920px;margin-bottom:18px}
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:18px;align-items:start}
+  .card{background:#fff;border:1px solid #e7e8ea;border-radius:14px;box-shadow:0 1px 2px rgba(16,24,40,.05);padding:18px}
+  canvas{width:100%;display:block}
+  .small{font-size:13px;color:#5b6472}
+  .lbl2{font-size:12.5px;font-weight:600;margin-bottom:5px;color:#374151}
+  .btn{border:1px solid #d4d6da;background:#fff;color:#1c2330;border-radius:9px;padding:8px 12px;font-size:13.5px;font-weight:600;cursor:pointer;transition:all .15s}
+  .btn:hover{border-color:#9aa0aa;background:#fafafa;transform:translateY(-1px);box-shadow:0 3px 8px rgba(16,24,40,.10)}
+  .btn.primary{background:linear-gradient(135deg,#3b82f6,#1d4fd7);border-color:#1d4fd7;color:#fff}
+  .btn.big{width:100%;padding:12px;font-size:15px;margin-bottom:8px}
+  .seg{display:flex;border:1px solid #d4d6da;border-radius:10px;overflow:hidden;margin-bottom:12px}
+  .seg button{flex:1;border:0;background:#fff;padding:8px 2px;font-size:13px;font-weight:600;cursor:pointer;color:#5b6472}
+  .seg button+button{border-left:1px solid #eceef1}
+  .seg button.on{background:#2563eb;color:#fff}
+  .chk{display:flex;align-items:center;gap:8px;font-size:13.5px;margin-bottom:12px;cursor:pointer}
+  .readout{background:#f6f8ff;border:1px solid #dbe4ff;border-radius:11px;padding:10px 14px;margin-bottom:9px}
+  .readout .lbl{font-size:11.5px;letter-spacing:.08em;color:#5b6472;font-weight:600}
+  .readout .num{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+  .readout.hero{background:#eff4ff;border-color:#c9d8fb}
+  .readout.hero .num{color:#1d4ed8;font-size:30px}
+  .readout.truth{background:#fef2f2;border-color:#fbd5d5}
+  .readout.truth .num{color:#b91c1c}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;min-height:24px}
+  .chips span{font-size:12.5px;font-variant-numeric:tabular-nums;background:#fff;border:1px solid #dbe4ff;border-radius:999px;padding:1px 9px;color:#1d4ed8}
+  .chips span:first-child{background:#2563eb;color:#fff;border-color:#2563eb;font-weight:700}
+  .msg{border-radius:11px;padding:11px 13px;font-size:13.5px;background:#fbfbf9;border:1px dashed #d4d6da}
+  .reset{border:0;background:none;color:#2563eb;font-size:13px;cursor:pointer;padding:0;margin-bottom:12px}
+  .reset:hover{text-decoration:underline}
+  .bh{font-family:'Cambria Math',Cambria,Georgia,serif;font-style:normal}
+  @keyframes pop{0%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .pop{animation:pop .35s ease;display:inline-block}
+  @media(max-width:900px){.layout{grid-template-columns:1fr}}
+  .howto{background:#fff;border:1px solid #e7e8ea;border-left:4px solid #2563eb;border-radius:12px;padding:10px 18px;margin:-4px 0 18px;box-shadow:0 1px 2px rgba(16,24,40,.05)}
+  .howto summary{cursor:pointer;font-weight:700;font-size:14.5px;color:#1d4ed8;padding:2px 0}
+  .howto ol{margin:8px 0 4px 22px;font-size:14px;display:grid;gap:4px}
+  .howto .key{margin:10px 0 4px;padding-top:9px;border-top:1px solid #f0f1f3;font-size:14px}
+  .howto .key b{color:#b91c1c}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <nav><a href="index.html">← All simulations</a></nav>
+  <div class="kicker">Econometrics · Recap · Simulation 3b</div>
+  <h1>One sample, one slope</h1>
+  <p class="sub">The grey cloud is a made-up <strong>population</strong> of men: years of education and log weekly wage, with a true return to schooling of
+  <span style="color:#b91c1c;font-weight:600">β = 0.046</span> (red dashed line). In real life we never see the cloud or the red line: we see <strong>one sample</strong>.
+  Our Stata regression on 165 men gave <span class="bh">β&#770;</span> = 0.046. What if we had drawn different men?</p>
+  <details class="howto" open>
+    <summary>How to use this simulation</summary>
+    <ol>
+      <li>Click <strong>Draw a new sample and run OLS</strong>. 165 men are picked at random (blue dots), and OLS fits a line through them (blue line). Its slope <span class="bh">β&#770;</span> appears on the right.</li>
+      <li>Click again several times. Same population, same regression, different men. Compare each new <span class="bh">β&#770;</span> with the earlier ones, listed under the big number.</li>
+      <li>Change <strong>N</strong> to 30 and draw a few samples. Then try 1,000. How much do the lines move now?</li>
+      <li>Untick <strong>Keep the lines from earlier samples</strong> to see only the latest sample.</li>
+    </ol>
+    <p class="key"><b>Key idea:</b> <span class="bh">β&#770;</span> depends on which men happen to be in the sample, so it is a random variable. The smaller the sample, the more it varies.</p>
+  </details>
+</header>
+
+<main class="layout">
+  <section class="card">
+    <canvas id="plot"></canvas>
+  </section>
+
+  <aside class="card">
+    <button class="btn primary big" id="b1">Draw a new sample and run OLS</button>
+    <div class="lbl2">Men in each sample, N</div>
+    <div class="seg" id="segN">
+      <button data-n="30">30</button><button data-n="165" class="on">165</button><button data-n="1000">1,000</button>
+    </div>
+    <label class="chk"><input type="checkbox" id="chkOld" checked> Keep the lines from earlier samples</label>
+
+    <div class="readout hero">
+      <div class="lbl">THIS SAMPLE'S ESTIMATE <span class="bh">β&#770;</span></div>
+      <div class="num" id="bNow">–</div>
+      <div class="small" id="bNowTxt">&nbsp;</div>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="row2">
+      <div class="readout"><div class="lbl">SAMPLES DRAWN</div><div class="num" id="count">0</div></div>
+      <div class="readout truth"><div class="lbl">TRUE β</div><div class="num">0.046</div></div>
+    </div>
+    <button class="reset" id="bReset">↺ start again</button>
+    <div class="msg" id="msg"></div>
+  </aside>
+</main>
+</div>
+
+<script>
+'use strict';
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function gaussR(r){let u=0,v=0;while(u===0)u=r();while(v===0)v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+const gauss=()=>gaussR(Math.random);
+function fmt(x,d){return x.toLocaleString('en-GB',{minimumFractionDigits:d,maximumFractionDigits:d})}
+const pct=b=>(b<0?'−':'')+fmt(Math.abs(b)*100,1)+'%';
+function ctx2d(cv,h){
+  const dpr=window.devicePixelRatio||1, w=cv.clientWidth||600;
+  cv.width=w*dpr;cv.height=h*dpr;cv.style.height=h+'px';
+  const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);
+  return {g,w,h};
+}
+// canvas text containing β̂: the hat is only placed correctly by a math font
+function fillHat(g,txt,x,y){
+  if(txt.indexOf('β̂')<0){g.fillText(txt,x,y);return}
+  const parts=txt.split('β̂'), base=g.font, size=+(base.match(/(\d+(\.\d+)?)px/)||[0,13])[1];
+  const hatFont=(base.match(/^(\d00)\s/)?base.match(/^(\d00)\s/)[1]+' ':'')+(size+1.5)+'px "Cambria Math",Cambria,serif';
+  const wOf=(s,f)=>{g.font=f;const w=g.measureText(s).width;g.font=base;return w};
+  const hw=wOf('β̂',hatFont), total=parts.reduce((a,p)=>a+wOf(p,base),0)+hw*(parts.length-1);
+  const al=g.textAlign;let cx=al==='center'?x-total/2:(al==='right'||al==='end')?x-total:x;
+  g.textAlign='left';
+  parts.forEach((p,i)=>{g.fillText(p,cx,y);cx+=wOf(p,base);if(i<parts.length-1){g.font=hatFont;g.fillText('β̂',cx,y);g.font=base;cx+=hw}});
+  g.textAlign=al;
+}
+
+// ---------- population model: same as Simulation 4 (calibrated to reg log_w_wage year_ed) ----------
+const A=5.31, B=0.046, XM=13, SX=2.9, SG=0.64;
+const edu=z=>Math.max(0,Math.min(24,XM+SX*z));
+const cloud=[];
+(function(){const r=mulberry32(5);for(let i=0;i<1500;i++){const x=edu(gaussR(r));cloud.push([x,A+B*x+SG*gaussR(r)])}})();
+
+let N=165, slopes=[], lines=[], last=null, pulse=0;
+function drawSample(){
+  const xs=new Array(N),ys=new Array(N);let mx=0,my=0;
+  for(let i=0;i<N;i++){const x=edu(gauss());xs[i]=x;ys[i]=A+B*x+SG*gauss();mx+=x;my+=ys[i]}
+  mx/=N;my/=N;
+  let sxx=0,sxy=0;for(let i=0;i<N;i++){const dx=xs[i]-mx;sxx+=dx*dx;sxy+=dx*(ys[i]-my)}
+  const b=sxy/sxx,a=my-b*mx;
+  slopes.push(b);lines.push({a,b});if(lines.length>40)lines.shift();
+  last={xs,ys,a,b};
+}
+
+// ---------- scatter ----------
+const plot=document.getElementById('plot');
+const PH=520, X0=0,X1=24,Y0=3.4,Y1=8.4, M={l:52,r:14,t:12,b:42};
+const sx=(x,w)=>M.l+(x-X0)/(X1-X0)*(w-M.l-M.r);
+const sy=(y,h)=>h-M.b-(y-Y0)/(Y1-Y0)*(h-M.b-M.t);
+function drawPlot(){
+  const {g,w,h}=ctx2d(plot,PH);g.clearRect(0,0,w,h);
+  g.font='12px "Segoe UI",sans-serif';g.textAlign='center';g.textBaseline='top';
+  for(let x=0;x<=24;x+=4){const p=sx(x,w);g.strokeStyle='#eef0f2';g.beginPath();g.moveTo(p,M.t);g.lineTo(p,h-M.b);g.stroke();g.fillStyle='#6b7280';g.fillText(x,p,h-M.b+8)}
+  g.textAlign='right';g.textBaseline='middle';
+  for(let y=4;y<=8;y++){const p=sy(y,h);g.strokeStyle='#eef0f2';g.beginPath();g.moveTo(M.l,p);g.lineTo(w-M.r,p);g.stroke();g.fillStyle='#6b7280';g.fillText(y,M.l-9,p)}
+  g.strokeStyle='#c9ccd2';g.strokeRect(M.l,M.t,w-M.l-M.r,h-M.t-M.b);
+  g.fillStyle='#374151';g.font='600 13px "Segoe UI",sans-serif';g.textAlign='center';g.textBaseline='alphabetic';
+  g.fillText('Years of education',(M.l+w-M.r)/2,h-8);
+  g.save();g.translate(15,(M.t+h-M.b)/2);g.rotate(-Math.PI/2);g.fillText('Log weekly wage',0,0);g.restore();
+
+  g.save();g.beginPath();g.rect(M.l,M.t,w-M.l-M.r,h-M.t-M.b);g.clip();
+  const seg=(a,b)=>{g.beginPath();g.moveTo(sx(X0,w),sy(a+b*X0,h));g.lineTo(sx(X1,w),sy(a+b*X1,h));g.stroke()};
+  g.fillStyle='rgba(120,126,138,.25)';
+  for(const [x,y] of cloud){g.beginPath();g.arc(sx(x,w),sy(y,h),1.6,0,7);g.fill()}
+  if(document.getElementById('chkOld').checked){
+    g.lineWidth=1.5;g.strokeStyle='rgba(37,99,235,.16)';
+    for(let i=0;i<lines.length-1;i++)seg(lines[i].a,lines[i].b);
+  }
+  g.strokeStyle='#dc2626';g.lineWidth=2.2;g.setLineDash([8,6]);seg(A,B);g.setLineDash([]);
+  if(last){
+    const r=(N>400?2.2:3.4)+pulse*3;
+    g.fillStyle='#2563eb';
+    for(let i=0;i<last.xs.length;i++){g.beginPath();g.arc(sx(last.xs[i],w),sy(last.ys[i],h),r,0,7);g.fill()}
+    g.strokeStyle='rgba(37,99,235,.25)';g.lineWidth=9;seg(last.a,last.b);
+    g.strokeStyle='#1d4ed8';g.lineWidth=3;seg(last.a,last.b);
+  }
+  g.restore();
+  // legend
+  g.font='12.5px "Segoe UI",sans-serif';g.textAlign='left';g.textBaseline='middle';
+  const lx=M.l+12;let ly=M.t+15;
+  g.fillStyle='rgba(255,255,255,.88)';g.fillRect(lx-6,ly-11,410,last?44:24);
+  g.strokeStyle='#dc2626';g.lineWidth=2.2;g.setLineDash([7,5]);g.beginPath();g.moveTo(lx,ly);g.lineTo(lx+26,ly);g.stroke();g.setLineDash([]);
+  g.fillStyle='#374151';g.fillText('population line: log wage = 5.31 + 0.046 × education',lx+34,ly);
+  if(last){
+    ly+=20;g.strokeStyle='#1d4ed8';g.lineWidth=3;g.beginPath();g.moveTo(lx,ly);g.lineTo(lx+26,ly);g.stroke();
+    g.fillStyle='#1d4ed8';g.font='600 12.5px "Segoe UI",sans-serif';
+    fillHat(g,'OLS line in this sample of '+N+' men: β̂ = '+fmt(last.b,3),lx+34,ly);
+  }
+}
+
+// ---------- readouts ----------
+function updateReadouts(){
+  const k=slopes.length;
+  document.getElementById('count').textContent=k.toLocaleString();
+  document.getElementById('bNow').textContent=last?fmt(last.b,3):'–';
+  document.getElementById('bNowTxt').textContent=last?'one more year of education ≈ '+pct(last.b)+' higher wages in this sample':' ';
+  document.getElementById('chips').innerHTML=slopes.slice(-10).reverse().map(b=>'<span>'+fmt(b,3)+'</span>').join('');
+  const msg=document.getElementById('msg');
+  if(k===0)msg.innerHTML='Click <strong>Draw a new sample</strong>. '+N+' men are picked at random from the population (blue dots), and OLS fits a line through <em>them</em>.';
+  else if(k===1)msg.innerHTML='This sample gives <span class="bh">β&#770;</span> = <strong>'+fmt(last.b,3)+'</strong>. Now click again: <em>same population, same regression, new men</em>.';
+  else if(k<15){
+    const lo=Math.min(...slopes),hi=Math.max(...slopes);
+    msg.innerHTML='A new sample gives a new line and a new <span class="bh">β&#770;</span>: so far between <strong>'+fmt(lo,3)+'</strong> and <strong>'+fmt(hi,3)+'</strong>. Nothing changed except <em>which men happened to be drawn</em>. This is <strong>sampling variation</strong>.';
+  }
+  else msg.innerHTML='Our Stata estimate of 0.046 is just <strong>one</strong> of these draws. With a different sample, we would have reported a different number. So <span class="bh">β&#770;</span> is a <strong>random variable</strong>. How far can we trust the one number we have?';
+}
+function drawAll(){drawPlot();updateReadouts()}
+
+// ---------- interactions ----------
+function popEl(el){el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop')}
+function startPulse(){const t0=performance.now(),T=420;(function step(t){const u=Math.min(1,(t-t0)/T);pulse=1-u;drawPlot();if(u<1)requestAnimationFrame(step);else{pulse=0;drawPlot()}})(t0)}
+document.getElementById('b1').addEventListener('click',()=>{drawSample();updateReadouts();popEl(document.getElementById('bNow'));startPulse()});
+document.getElementById('bReset').addEventListener('click',()=>{slopes=[];lines=[];last=null;drawAll()});
+document.getElementById('chkOld').addEventListener('change',drawPlot);
+document.getElementById('segN').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  document.querySelectorAll('#segN button').forEach(x=>x.classList.toggle('on',x===b));
+  N=+b.dataset.n;slopes=[];lines=[];last=null;drawAll();
+});
+window.addEventListener('resize',drawAll);
+
+// ---------- init (?auto=6 for screenshots) ----------
+const q=new URLSearchParams(location.search);
+if(q.has('auto'))for(let i=0;i<(+q.get('auto')||0);i++)drawSample();
+drawAll();
+</script>
+</body>
+</html>

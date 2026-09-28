@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3 · Sampling Variation and the CLT — Econometrics Recap</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:#1c2330;line-height:1.5;
+       background:radial-gradient(1100px 520px at 85% -8%,#e8efff 0%,rgba(232,239,255,0) 60%),
+                  radial-gradient(900px 500px at -10% 110%,#fdf3e4 0%,rgba(253,243,228,0) 55%),#f6f6f3}
+  .wrap{max-width:1180px;margin:0 auto;padding:22px 20px 60px}
+  nav a{color:#2563eb;text-decoration:none;font-size:14px}
+  nav a:hover{text-decoration:underline}
+  .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#2563eb;font-weight:600;margin-top:8px}
+  h1{font-size:30px;margin:2px 0 6px;letter-spacing:-.01em}
+  h2{font-size:15px;margin-bottom:2px;display:flex;align-items:center;gap:8px}
+  h2 .tag{font-size:11px;letter-spacing:.08em;font-weight:700;color:#fff;border-radius:6px;padding:1px 7px}
+  .sub{color:#5b6472;max-width:920px;margin-bottom:18px}
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:18px;align-items:start}
+  .card{background:#fff;border:1px solid #e7e8ea;border-radius:14px;box-shadow:0 1px 2px rgba(16,24,40,.05);padding:18px}
+  .panel+.panel{margin-top:14px;padding-top:12px;border-top:1px solid #f0f1f3}
+  canvas{width:100%;display:block}
+  .small{font-size:13px;color:#5b6472}
+  .lbl2{font-size:12.5px;font-weight:600;margin-bottom:5px;color:#374151}
+  .btn{border:1px solid #d4d6da;background:#fff;color:#1c2330;border-radius:9px;padding:8px 12px;font-size:13.5px;font-weight:600;cursor:pointer;transition:all .15s}
+  .btn:hover{border-color:#9aa0aa;background:#fafafa;transform:translateY(-1px);box-shadow:0 3px 8px rgba(16,24,40,.10)}
+  .btn.primary{background:linear-gradient(135deg,#3b82f6,#1d4fd7);border-color:#1d4fd7;color:#fff}
+  .btnrow{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 12px}
+  .seg{display:flex;border:1px solid #d4d6da;border-radius:10px;overflow:hidden;margin-bottom:12px}
+  .seg button{flex:1;border:0;background:#fff;padding:8px 2px;font-size:13px;font-weight:600;cursor:pointer;color:#5b6472}
+  .seg button+button{border-left:1px solid #eceef1}
+  .seg button.on{background:#2563eb;color:#fff}
+  .seg.v{flex-direction:column}
+  .seg.v button{text-align:left;padding:8px 12px}
+  .seg.v button+button{border-left:0;border-top:1px solid #eceef1}
+  .chk{display:flex;align-items:center;gap:8px;font-size:13.5px;margin-bottom:12px;cursor:pointer}
+  .readout{background:#f6f8ff;border:1px solid #dbe4ff;border-radius:11px;padding:9px 14px;margin-bottom:9px}
+  .readout .lbl{font-size:11.5px;letter-spacing:.08em;color:#5b6472;font-weight:600}
+  .readout .num{font-size:21px;font-weight:700;font-variant-numeric:tabular-nums}
+  .readout .num .vs{font-size:13px;font-weight:600;color:#b91c1c;margin-left:6px}
+  .readout.hero{background:#fff7ed;border-color:#fde2bf}
+  .readout.hero .num{color:#c2570b}
+  .msg{border-radius:11px;padding:11px 13px;font-size:13.5px;background:#fbfbf9;border:1px dashed #d4d6da}
+  @keyframes pop{0%{transform:scale(1.18)}100%{transform:scale(1)}}
+  .pop{animation:pop .35s ease;display:inline-block}
+  @media(max-width:900px){.layout{grid-template-columns:1fr}}
+  .howto{background:#fff;border:1px solid #e7e8ea;border-left:4px solid #2563eb;border-radius:12px;padding:10px 18px;margin:-4px 0 18px;box-shadow:0 1px 2px rgba(16,24,40,.05)}
+  .howto summary{cursor:pointer;font-weight:700;font-size:14.5px;color:#1d4ed8;padding:2px 0}
+  .howto ol{margin:8px 0 4px 22px;font-size:14px;display:grid;gap:4px}
+  .howto .key{margin:10px 0 4px;padding-top:9px;border-top:1px solid #f0f1f3;font-size:14px}
+  .howto .key b{color:#b91c1c}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <nav><a href="index.html">← All simulations</a></nav>
+  <div class="kicker">Econometrics · Recap · Simulation 3</div>
+  <h1>Sampling variation and the central limit theorem</h1>
+  <p class="sub">We draw random samples of size n from a made-up population and compute each sample's average Ȳ.
+  Different samples give different averages. What does the distribution of all these averages look like?</p>
+  <details class="howto" open>
+    <summary>How to use this simulation</summary>
+    <ol>
+      <li>Keep <strong>Annual earnings</strong> and <strong>n = 30</strong>. Click <strong>Draw 1 sample</strong> several times. Each sample (blue dots) gives a different average Ȳ (orange line). This is <strong>sampling variation</strong>.</li>
+      <li>Click <strong>Draw 1,000</strong>. The bottom chart collects all the Ȳ's: it shows the <strong>sampling distribution</strong> of the sample average.</li>
+      <li>Choose <strong>n = 1</strong> and draw 1,000: the histogram looks just like the population. Then try <strong>n = 5, 30 and 500</strong>, drawing 1,000 each time. The shape turns into a bell curve.</li>
+      <li>Tick <strong>Show the normal curve</strong> and click <strong>Zoom in</strong> to compare the histogram with the normal distribution the CLT predicts.</li>
+      <li>Repeat with the other populations: the <strong>die</strong> (flat) and <strong>employed</strong> (only zeros and ones).</li>
+    </ol>
+    <p class="key"><b>Key idea:</b> whatever the population looks like, the average of a large sample is approximately normally distributed around μ, with spread σ/√n. This is the central limit theorem.</p>
+  </details>
+</header>
+
+<main class="layout">
+  <section class="card">
+    <div class="panel">
+      <h2><span class="tag" style="background:#6b7280">POPULATION</span><span id="popTitle"></span></h2>
+      <canvas id="pop"></canvas>
+    </div>
+    <div class="panel">
+      <h2><span class="tag" style="background:#2563eb">ONE SAMPLE</span><span>the latest sample of n = <span id="nTitle"></span> and its average Ȳ</span></h2>
+      <canvas id="samp"></canvas>
+    </div>
+    <div class="panel">
+      <h2><span class="tag" style="background:#ea8c1f">ALL SAMPLES</span><span>the distribution of the sample averages Ȳ</span></h2>
+      <canvas id="means"></canvas>
+    </div>
+  </section>
+
+  <aside class="card">
+    <div class="lbl2">Population</div>
+    <div class="seg v" id="segPop">
+      <button data-p="earn" class="on">Annual earnings (skewed, 15% zeros)</button>
+      <button data-p="die">Roll of a die (flat)</button>
+      <button data-p="emp">Employed? 1 = yes, 0 = no</button>
+    </div>
+    <div class="lbl2">Sample size n</div>
+    <div class="seg" id="segN">
+      <button data-n="1">1</button><button data-n="2">2</button><button data-n="5">5</button>
+      <button data-n="10">10</button><button data-n="30" class="on">30</button><button data-n="100">100</button><button data-n="500">500</button>
+    </div>
+    <div class="btnrow">
+      <button class="btn primary" id="b1">Draw 1 sample</button>
+      <button class="btn" id="b100">Draw 100</button>
+      <button class="btn" id="b1000">Draw 1,000</button>
+      <button class="btn" id="bReset">Reset</button>
+    </div>
+    <div class="lbl2">Bottom panel axis</div>
+    <div class="seg" id="segAx">
+      <button data-a="pop" class="on">Same as population</button>
+      <button data-a="zoom">Zoom in</button>
+    </div>
+    <label class="chk"><input type="checkbox" id="chkNorm"> Show the normal curve the CLT predicts</label>
+
+    <div class="readout">
+      <div class="lbl">SAMPLES DRAWN</div>
+      <div class="num" id="count">0</div>
+    </div>
+    <div class="readout">
+      <div class="lbl">AVERAGE OF ALL THE Ȳ'S</div>
+      <div class="num"><span id="meanM">–</span><span class="vs" id="muVs"></span></div>
+    </div>
+    <div class="readout hero">
+      <div class="lbl">SPREAD (SD) OF THE Ȳ'S</div>
+      <div class="num"><span id="sdM">–</span><span class="vs" id="seVs"></span></div>
+      <div class="small">the <strong>standard error</strong> of the sample mean</div>
+    </div>
+    <div class="msg" id="msg"></div>
+  </aside>
+</main>
+</div>
+
+<script>
+'use strict';
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function gaussR(r){let u=0,v=0;while(u===0)u=r();while(v===0)v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+function fmt(x,d){return x.toLocaleString('en-GB',{minimumFractionDigits:d,maximumFractionDigits:d})}
+function money(k){return '$'+Math.round(k*1000).toLocaleString('en-US')}
+function pdf(z){return Math.exp(-z*z/2)/Math.sqrt(2*Math.PI)}
+function ctx2d(cv,h){
+  const dpr=window.devicePixelRatio||1, w=cv.clientWidth||600;
+  cv.width=w*dpr;cv.height=h*dpr;cv.style.height=h+'px';
+  const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);
+  return {g,w,h};
+}
+
+// ---------- populations (20,000 people each, fixed) ----------
+const NPOP=20000;
+function build(gen,seed){const r=mulberry32(seed),a=[];for(let i=0;i<NPOP;i++)a.push(gen(r));return a}
+const POPS={
+  earn:{title:'annual earnings of 20,000 people',lo:0,hi:100,discrete:false,
+        ticks:[0,20,40,60,80,100],tick:v=>'$'+v+'k',val:v=>money(v),
+        data:build(r=>r()<0.15?0:Math.min(100,Math.exp(Math.log(17)+0.62*gaussR(r))),2026)},
+  die:{title:'20,000 rolls of a fair die',lo:0.5,hi:6.5,discrete:true,
+        ticks:[1,2,3,4,5,6],tick:v=>String(v),val:v=>fmt(v,2),
+        data:Array.from({length:NPOP},(_,i)=>1+i%6)},                  // exactly 1/6 of each face: μ = 3.5
+  emp:{title:'20,000 men: employed (1) or not (0)',lo:-0.5,hi:1.5,discrete:true,
+        ticks:[0,0.5,1],tick:v=>String(v),val:v=>fmt(v,3),
+        data:Array.from({length:NPOP},(_,i)=>i<0.85*NPOP?1:0)}          // exactly 85% employed: μ = 0.85
+};
+for(const k in POPS){
+  const P=POPS[k], d=P.data;
+  P.mu=d.reduce((a,b)=>a+b,0)/d.length;
+  P.sigma=Math.sqrt(d.reduce((a,b)=>a+(b-P.mu)**2,0)/d.length);
+}
+
+// ---------- state ----------
+let P=POPS.earn, n=30, axis='pop';
+let means=[], lastS=null, lastM=null, sumM=0, sumM2=0;
+function drawSample(){
+  const s=new Array(n);let tot=0;
+  for(let i=0;i<n;i++){const v=P.data[Math.floor(Math.random()*NPOP)];s[i]=v;tot+=v}
+  const m=tot/n;
+  means.push(m);sumM+=m;sumM2+=m*m;lastS=s;lastM=m;
+}
+function resetAll(){means=[];lastS=null;lastM=null;sumM=0;sumM2=0;drawAll()}
+const se=()=>P.sigma/Math.sqrt(n);
+
+// ---------- panels ----------
+const popCv=document.getElementById('pop'), sampCv=document.getElementById('samp'), meansCv=document.getElementById('means');
+const H1=150, H2=112, H3=250, MG={l:50,r:30,t:16,b:30};
+function axisX(g,w,h,lo,hi,ticks,lab){
+  const bx=v=>MG.l+(v-lo)/(hi-lo)*(w-MG.l-MG.r);
+  g.strokeStyle='#c9ccd2';g.lineWidth=1;g.beginPath();g.moveTo(MG.l,h-MG.b);g.lineTo(w-MG.r,h-MG.b);g.stroke();
+  g.font='12px "Segoe UI",sans-serif';g.fillStyle='#6b7280';g.textAlign='center';g.textBaseline='top';
+  for(const v of ticks)g.fillText(lab(v),bx(v),h-MG.b+7);
+  return bx;
+}
+function muLine(g,bx,h,top,label){
+  g.strokeStyle='#dc2626';g.lineWidth=2;g.setLineDash([6,4]);
+  g.beginPath();g.moveTo(bx(P.mu),top);g.lineTo(bx(P.mu),h-MG.b);g.stroke();g.setLineDash([]);
+  if(label){g.fillStyle='#dc2626';g.font='600 12.5px "Segoe UI",sans-serif';g.textAlign='left';g.textBaseline='top';
+    g.fillText(' μ = '+P.val(P.mu),bx(P.mu)+3,top)}
+}
+function binsFor(lo,hi,target){
+  // discrete populations: sample means live on a grid of step 1/n, so bins follow that grid (no comb artefacts)
+  if(P.discrete){
+    const step=1/n, bw=Math.max(1,Math.round((hi-lo)/target/step))*step;
+    const e0=Math.floor(lo/step)*step-step/2;
+    return {e0,bw,nb:Math.ceil((hi-e0)/bw)};
+  }
+  return {e0:lo,bw:(hi-lo)/target,nb:target};
+}
+
+function drawPop(){
+  const {g,w,h}=ctx2d(popCv,H1);g.clearRect(0,0,w,h);
+  const bx=axisX(g,w,h,P.lo,P.hi,P.ticks,P.tick);
+  const nb=P===POPS.earn?40:P===POPS.die?6:2, bw=(P.hi-P.lo)/nb, bins=new Array(nb).fill(0);
+  for(const v of P.data)bins[Math.min(nb-1,Math.max(0,Math.floor((v-P.lo)/bw)))]++;
+  const maxC=Math.max(...bins), by=c=>h-MG.b-c/maxC*(h-MG.t-MG.b-4);
+  const pad=P.discrete?Math.max(2,(bx(P.lo+bw)-bx(P.lo))*0.3):0.5;
+  for(let k=0;k<nb;k++){
+    const x0=bx(P.lo+k*bw),x1=bx(P.lo+(k+1)*bw),y=by(bins[k]);
+    g.fillStyle='rgba(120,126,138,.45)';g.fillRect(x0+pad,y,Math.max(1,x1-x0-2*pad),h-MG.b-y);
+  }
+  muLine(g,bx,h,MG.t-12,true);
+  g.fillStyle='#5b6472';g.font='12px "Segoe UI",sans-serif';g.textAlign='right';g.textBaseline='top';
+  g.fillText('σ = '+P.val(P.sigma),w-MG.r,MG.t-12);
+}
+
+function drawSamp(){
+  const {g,w,h}=ctx2d(sampCv,H2);g.clearRect(0,0,w,h);
+  const bx=axisX(g,w,h,P.lo,P.hi,P.ticks,P.tick);
+  muLine(g,bx,h,MG.t-6,false);
+  if(!lastS){
+    g.fillStyle='#8a909c';g.font='13px "Segoe UI",sans-serif';g.textAlign='center';g.textBaseline='middle';
+    g.fillText('no sample yet: click “Draw 1 sample”',(MG.l+w-MG.r)/2,(MG.t+h-MG.b)/2);return;
+  }
+  const r=mulberry32(99), rad=n>100?2.2:n>30?3:4;
+  const jx=P.discrete?(bx(P.lo+1)-bx(P.lo))*0.28:0;
+  for(let i=0;i<lastS.length;i++){
+    const x=bx(lastS[i])+(r()-0.5)*2*jx, y=MG.t+4+r()*(h-MG.t-MG.b-10);
+    g.fillStyle='rgba(37,99,235,.7)';g.beginPath();g.arc(x,y,rad,0,7);g.fill();
+  }
+  const x=bx(lastM);
+  g.strokeStyle='#ea8c1f';g.lineWidth=3;g.beginPath();g.moveTo(x,MG.t-6);g.lineTo(x,h-MG.b);g.stroke();
+  g.font='700 13px "Segoe UI",sans-serif';g.textBaseline='top';
+  const right=x>w*0.7, txt='Ȳ = '+P.val(lastM), tw=g.measureText(txt).width, tx=right?x-7-tw:x+7;
+  g.fillStyle='rgba(255,255,255,.9)';g.fillRect(tx-3,MG.t-11,tw+6,17);
+  g.fillStyle='#c2570b';g.textAlign='left';g.fillText(txt,tx,MG.t-10);
+}
+
+function meanRange(){
+  if(axis==='pop')return {lo:P.lo,hi:P.hi};
+  const s=se();return {lo:P.mu-4.2*s,hi:P.mu+4.2*s};
+}
+function niceTicks(lo,hi){
+  const span=hi-lo, raw=span/6, mag=Math.pow(10,Math.floor(Math.log10(raw)));
+  const step=[1,2,2.5,5,10].map(k=>k*mag).find(s=>s>=raw);
+  const out=[];for(let v=Math.ceil(lo/step)*step;v<=hi+1e-9;v+=step)out.push(+v.toFixed(10));
+  return out;
+}
+function drawMeans(){
+  const {g,w,h}=ctx2d(meansCv,H3);g.clearRect(0,0,w,h);
+  const {lo,hi}=meanRange();
+  const ticks=axis==='pop'?P.ticks:niceTicks(lo,hi);
+  const lab=axis==='pop'?P.tick:(P===POPS.earn?(v=>'$'+fmt(v,v%1?1:0)+'k'):(v=>fmt(v,Math.abs(hi-lo)<0.3?2:Math.abs(hi-lo)<3?1:0)));
+  const bx=axisX(g,w,h,lo,hi,ticks,lab);
+  const {e0,bw,nb}=binsFor(lo,hi,axis==='pop'?60:44);
+  const bins=new Array(nb).fill(0);let off=0;
+  for(const m of means){let k=Math.floor((m-e0)/bw);if(k===nb&&m<=hi+1e-9)k=nb-1;if(k>=0&&k<nb)bins[k]++;else off++}
+  const s=se(), curve=v=>means.length*bw*pdf((v-P.mu)/s)/s;
+  const showN=document.getElementById('chkNorm').checked;
+  const peak=showN&&means.length?curve(P.mu):0;
+  const maxC=Math.max(1,...bins,Math.min(peak,Math.max(1,...bins)*1.6));
+  const by=c=>h-MG.b-Math.min(c,maxC)/maxC*(h-MG.t-MG.b-6);
+  g.save();g.beginPath();g.rect(MG.l,0,w-MG.l-MG.r,h);g.clip();
+  for(let k=0;k<nb;k++){
+    if(!bins[k])continue;
+    const x0=bx(e0+k*bw),x1=bx(e0+(k+1)*bw),y=by(bins[k]);
+    const gr=g.createLinearGradient(0,y,0,h-MG.b);
+    gr.addColorStop(0,'rgba(234,140,31,.95)');gr.addColorStop(1,'rgba(217,119,6,.55)');
+    g.fillStyle=gr;g.fillRect(x0+0.5,y,Math.max(1,x1-x0-1),h-MG.b-y);
+  }
+  if(showN&&means.length){
+    g.strokeStyle='#1c2330';g.lineWidth=2.2;g.beginPath();
+    for(let i=0;i<=300;i++){const v=lo+(hi-lo)*i/300, y=by(curve(v));if(i===0)g.moveTo(bx(v),y);else g.lineTo(bx(v),y)}
+    g.stroke();
+    g.fillStyle='#1c2330';g.font='600 12px "Segoe UI",sans-serif';g.textAlign='left';g.textBaseline='top';
+    g.fillText('normal curve N(μ, σ²/n): centred at μ, SD = σ/√n = '+P.val(s),MG.l+6,MG.t-10);
+  }
+  g.restore();
+  muLine(g,bx,h,showN&&means.length?MG.t+8:MG.t-10,!(showN&&means.length));
+  if(!means.length){
+    g.fillStyle='#8a909c';g.font='13px "Segoe UI",sans-serif';g.textAlign='center';g.textBaseline='middle';
+    g.fillText('each sample adds its Ȳ here',(MG.l+w-MG.r)/2,(MG.t+h-MG.b)/2);
+  }
+  if(off>0){g.fillStyle='#6b7280';g.font='11.5px "Segoe UI",sans-serif';g.textAlign='right';g.textBaseline='bottom';
+    g.fillText(off+' outside the view',w-MG.r,h-2)}
+}
+
+function updateReadouts(){
+  const k=means.length;
+  document.getElementById('count').textContent=k.toLocaleString();
+  document.getElementById('nTitle').textContent=n;
+  document.getElementById('popTitle').textContent=P.title;
+  if(k>0){
+    const m=sumM/k;
+    document.getElementById('meanM').textContent=P.val(m);
+    document.getElementById('muVs').textContent='μ = '+P.val(P.mu);
+  }else{document.getElementById('meanM').textContent='–';document.getElementById('muVs').textContent=''}
+  if(k>1){
+    const m=sumM/k, sd=Math.sqrt(Math.max(0,(sumM2-k*m*m)/(k-1)));
+    document.getElementById('sdM').textContent=P.val(sd);
+    document.getElementById('seVs').textContent='σ/√n = '+P.val(se());
+  }else{document.getElementById('sdM').textContent='–';document.getElementById('seVs').textContent=''}
+  const msg=document.getElementById('msg');
+  if(k===0)msg.innerHTML='Click <strong>Draw 1 sample</strong>: n people are drawn at random from the population (blue dots) and we compute their average Ȳ (orange line).';
+  else if(k<8)msg.innerHTML='Another sample, another Ȳ. The average moves from sample to sample even though the population never changes. That is <strong>sampling variation</strong>, and it is why Ȳ is a <strong>random variable</strong>.';
+  else if(k<100)msg.innerHTML='The Ȳ\'s are piling up around μ. Press <strong>Draw 1,000</strong> to see the full shape of their distribution.';
+  else if(n<=2)msg.innerHTML='With n = '+n+' the histogram of averages still looks like the population'+(P===POPS.earn?' (spike at zero, long right tail)':'')+'. <strong>Now raise n</strong> and draw 1,000 again.';
+  else if(n<30)msg.innerHTML='Already less '+(P===POPS.earn?'skewed':'lumpy')+' than the population. Keep raising n.';
+  else msg.innerHTML='<strong>A bell curve</strong>, although the population is '+(P===POPS.earn?'skewed with a spike at $0':P===POPS.die?'completely flat':'just zeros and ones')+'. That is the <strong>central limit theorem</strong>. Tick the normal curve to compare. '+
+    (axis==='pop'?'The spread is also much smaller than the population\'s: σ/√n. Try <strong>Zoom in</strong> to see the shape.':'Quadruple n and the spread halves.');
+}
+
+function drawAll(){drawPop();drawSamp();drawMeans();updateReadouts()}
+
+// ---------- animation ----------
+function flyDot(){
+  const sr=sampCv.getBoundingClientRect(), mr=meansCv.getBoundingClientRect();
+  const bxS=v=>MG.l+(v-P.lo)/(P.hi-P.lo)*((sampCv.clientWidth||600)-MG.l-MG.r);
+  const {lo,hi}=meanRange();
+  const bxM=v=>MG.l+(Math.max(lo,Math.min(hi,v))-lo)/(hi-lo)*((meansCv.clientWidth||600)-MG.l-MG.r);
+  const x0=sr.left+bxS(lastM), y0=sr.top+H2/2, x1=mr.left+bxM(lastM), y1=mr.top+H3-MG.b-6;
+  const d=document.createElement('div');
+  d.style.cssText='position:fixed;z-index:99;width:12px;height:12px;border-radius:50%;background:#ea8c1f;box-shadow:0 0 12px rgba(234,140,31,.85);pointer-events:none';
+  document.body.appendChild(d);
+  const t0=performance.now(),T=600;
+  (function step(t){
+    const u=Math.min(1,(t-t0)/T);
+    d.style.left=(x0+(x1-x0)*u-6)+'px';d.style.top=(y0+(y1-y0)*u*u-6)+'px';
+    if(u<1)requestAnimationFrame(step);else{d.remove();drawMeans();updateReadouts()}
+  })(t0);
+}
+let running=false;
+function runBatch(k){
+  if(running)return;running=true;
+  let done=0;
+  (function step(){
+    const m=Math.min(k>200?50:5,k-done);
+    for(let i=0;i<m;i++)drawSample();
+    done+=m;drawAll();
+    if(done<k)requestAnimationFrame(step);else running=false;
+  })();
+}
+function popEl(el){el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop')}
+
+// ---------- controls ----------
+document.getElementById('b1').addEventListener('click',()=>{
+  if(running)return;
+  drawSample();drawSamp();popEl(document.getElementById('count'));
+  document.getElementById('count').textContent=means.length.toLocaleString();
+  flyDot();
+});
+document.getElementById('b100').addEventListener('click',()=>runBatch(100));
+document.getElementById('b1000').addEventListener('click',()=>runBatch(1000));
+document.getElementById('bReset').addEventListener('click',()=>{if(!running)resetAll()});
+document.getElementById('chkNorm').addEventListener('change',drawAll);
+function seg(id,fn){
+  document.getElementById(id).addEventListener('click',e=>{
+    const b=e.target.closest('button');if(!b||running)return;
+    document.querySelectorAll('#'+id+' button').forEach(x=>x.classList.toggle('on',x===b));
+    fn(b);
+  });
+}
+seg('segPop',b=>{P=POPS[b.dataset.p];resetAll()});
+seg('segN',b=>{n=+b.dataset.n;resetAll()});
+seg('segAx',b=>{axis=b.dataset.a;drawAll()});
+window.addEventListener('resize',drawAll);
+
+// ---------- init (?pop=die&n=500&auto=1000&zoom&norm for screenshots) ----------
+const q=new URLSearchParams(location.search);
+function pick(id,attr,val){document.querySelectorAll('#'+id+' button').forEach(x=>x.classList.toggle('on',x.dataset[attr]===val))}
+if(POPS[q.get('pop')]){P=POPS[q.get('pop')];pick('segPop','p',q.get('pop'))}
+if(q.has('n')){n=+q.get('n');pick('segN','n',q.get('n'))}
+if(q.has('zoom')){axis='zoom';pick('segAx','a','zoom')}
+if(q.has('norm'))document.getElementById('chkNorm').checked=true;
+if(q.has('auto'))for(let i=0;i<(+q.get('auto')||0);i++)drawSample();
+drawAll();
+</script>
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>4 · Sampling Distribution of the OLS Estimate — Econometrics Recap</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:#1c2330;line-height:1.5;
+       background:radial-gradient(1100px 520px at 85% -8%,#e8efff 0%,rgba(232,239,255,0) 60%),
+                  radial-gradient(900px 500px at -10% 110%,#fdf3e4 0%,rgba(253,243,228,0) 55%),#f6f6f3}
+  .wrap{max-width:1180px;margin:0 auto;padding:22px 20px 60px}
+  nav a{color:#2563eb;text-decoration:none;font-size:14px}
+  nav a:hover{text-decoration:underline}
+  .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#2563eb;font-weight:600;margin-top:8px}
+  h1{font-size:30px;margin:2px 0 6px;letter-spacing:-.01em}
+  h2{font-size:15.5px;margin-bottom:2px}
+  .sub{color:#5b6472;max-width:920px;margin-bottom:18px}
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;align-items:start}
+  .card{background:#fff;border:1px solid #e7e8ea;border-radius:14px;box-shadow:0 1px 2px rgba(16,24,40,.05);padding:18px}
+  canvas{width:100%;display:block}
+  .small{font-size:13px;color:#5b6472}
+  .ctl{margin-bottom:12px}
+  .ctl label{display:flex;justify-content:space-between;font-size:13.5px;font-weight:600;margin-bottom:3px}
+  .ctl label .val{font-weight:700;color:#2563eb;font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%;accent-color:#2563eb}
+  .btn{border:1px solid #d4d6da;background:#fff;color:#1c2330;border-radius:9px;padding:8px 12px;font-size:13.5px;font-weight:600;cursor:pointer;transition:all .15s}
+  .btn:hover{border-color:#9aa0aa;background:#fafafa;transform:translateY(-1px);box-shadow:0 3px 8px rgba(16,24,40,.10)}
+  .btn.primary{background:linear-gradient(135deg,#3b82f6,#1d4fd7);border-color:#1d4fd7;color:#fff}
+  .btn.link{border:0;background:none;color:#2563eb;padding:0;font-size:13px}
+  .btn.link:hover{box-shadow:none;transform:none;text-decoration:underline;background:none}
+  .btnrow{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px}
+  .chk{display:flex;align-items:center;gap:8px;font-size:13.5px;margin-bottom:12px;cursor:pointer}
+  .formula{background:#fbfbf9;border:1px dashed #cfd2d7;border-radius:11px;padding:10px 12px;margin-bottom:12px;text-align:center;font-family:Georgia,'Times New Roman',serif;font-size:16px}
+  .formula .big{font-size:21px;font-weight:700;color:#1d4ed8;font-family:'Segoe UI',sans-serif;font-variant-numeric:tabular-nums}
+  .formula .note{font-family:'Segoe UI',sans-serif;font-size:12px;color:#5b6472;margin-top:3px}
+  .frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 3px}
+  .frac>span:first-child{border-bottom:1.5px solid #1c2330;padding:0 4px}
+  .frac>span:last-child{padding:0 4px}
+  .readout{background:#f6f8ff;border:1px solid #dbe4ff;border-radius:11px;padding:9px 14px;margin-bottom:9px}
+  .readout .lbl{font-size:11.5px;letter-spacing:.08em;color:#5b6472;font-weight:600}
+  .readout .num{font-size:21px;font-weight:700;font-variant-numeric:tabular-nums}
+  .readout.hero{background:#fff7ed;border-color:#fde2bf}
+  .readout.hero .num{color:#c2570b}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .agree{color:#15803d;font-weight:700;font-size:13px}
+  .msg{border-radius:11px;padding:11px 13px;font-size:13.5px;background:#fbfbf9;border:1px dashed #d4d6da}
+  .bottom{grid-column:1/-1}
+  #hist{cursor:crosshair}
+  @keyframes pop{0%{transform:scale(1.18)}100%{transform:scale(1)}}
+  .pop{animation:pop .35s ease;display:inline-block}
+  .bh{font-family:'Cambria Math',Cambria,Georgia,serif;font-style:normal}
+  @media(max-width:900px){.layout{grid-template-columns:1fr}}
+  .howto{background:#fff;border:1px solid #e7e8ea;border-left:4px solid #2563eb;border-radius:12px;padding:10px 18px;margin:-4px 0 18px;box-shadow:0 1px 2px rgba(16,24,40,.05)}
+  .howto summary{cursor:pointer;font-weight:700;font-size:14.5px;color:#1d4ed8;padding:2px 0}
+  .howto ol{margin:8px 0 4px 22px;font-size:14px;display:grid;gap:4px}
+  .howto .key{margin:10px 0 4px;padding-top:9px;border-top:1px solid #f0f1f3;font-size:14px}
+  .howto .key b{color:#b91c1c}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <nav><a href="index.html">← All simulations</a></nav>
+  <div class="kicker">Econometrics · Recap · Simulation 4</div>
+  <h1>The sampling distribution of the OLS estimate <span class="bh">β&#770;</span></h1>
+  <p class="sub">The grey cloud is a made-up <strong>population</strong> of men: years of education and log weekly wage, with a true return to schooling of <span style="color:#b91c1c;font-weight:600">β = 0.046</span> (4.6% per year).
+  Each sample of men gives its own OLS estimate <span class="bh">β&#770;</span>. Here we draw many samples and look at the distribution of all the <span class="bh">β&#770;</span>'s.
+  The starting settings match our Stata example: N = 165, Root MSE σ = 0.64, SD of education 2.9.</p>
+  <details class="howto" open>
+    <summary>How to use this simulation</summary>
+    <ol>
+      <li>Click <strong>Draw 1 sample</strong> a few times. Each sample gives a new line and a new <span class="bh">β&#770;</span>, which drops into the histogram at the bottom.</li>
+      <li>Click <strong>Draw 1,000</strong>. The <span class="bh">β&#770;</span>'s form a bell curve centred on the true β.</li>
+      <li>Tick <strong>Show the CLT curve</strong>. Compare three numbers: the <strong>SD of the <span class="bh">β&#770;</span>'s</strong> across all samples, the <strong>SE formula</strong>, and the <strong>SE Stata would print</strong> from one sample. They agree.</li>
+      <li>Move one slider at a time and draw 1,000 again: <strong>sample size N</strong>, <strong>noise σ</strong> and <strong>SD of education</strong>. Which changes make the SE smaller?</li>
+      <li>Hover over a bar of the histogram to highlight those regression lines in the scatter plot.</li>
+    </ol>
+    <p class="key"><b>Key idea:</b> <span class="bh">β&#770;</span> ~ N(β, SE²) with SE = σ / √(N × Var(X)). More data, less noise or more variation in X give a more precise estimate.</p>
+  </details>
+</header>
+
+<main class="layout">
+  <section class="card">
+    <canvas id="plot"></canvas>
+  </section>
+
+  <aside class="card">
+    <div class="ctl">
+      <label>Sample size N <span class="val" id="nVal"></span></label>
+      <input type="range" id="n" min="20" max="1000" step="5" value="165">
+    </div>
+    <div class="ctl">
+      <label>Noise: SD of the error σ <span class="val" id="sgVal"></span></label>
+      <input type="range" id="sg" min="0.2" max="1.4" step="0.02" value="0.64">
+    </div>
+    <div class="ctl">
+      <label>Variation in X: SD of education <span class="val" id="sxVal"></span></label>
+      <input type="range" id="sx" min="1" max="5" step="0.1" value="2.9">
+    </div>
+    <button class="btn link" id="bDefault" style="margin-bottom:10px">↺ back to our Stata example (165, 0.64, 2.9)</button>
+
+    <div class="formula">
+      SE(<span class="bh">β&#770;</span>) = <span class="frac"><span>σ</span><span>√(N × Var(X))</span></span> =
+      <span class="frac"><span id="fS"></span><span id="fD"></span></span> = <span class="big" id="fSE"></span>
+      <div class="note">what the CLT says the spread of the <span class="bh">β&#770;</span>'s should be</div>
+    </div>
+
+    <div class="btnrow">
+      <button class="btn primary" id="b1">Draw 1 sample</button>
+      <button class="btn" id="b100">Draw 100</button>
+      <button class="btn" id="b1000">Draw 1,000</button>
+      <button class="btn" id="bReset">Reset</button>
+    </div>
+    <label class="chk"><input type="checkbox" id="chkNorm"> Show the CLT curve N(β, SE²)</label>
+
+    <div class="row2">
+      <div class="readout"><div class="lbl">SAMPLES</div><div class="num" id="count">0</div></div>
+      <div class="readout"><div class="lbl">AVERAGE <span class="bh">β&#770;</span></div><div class="num" id="meanB">–</div></div>
+    </div>
+    <div class="readout hero">
+      <div class="lbl">SD OF THE <span class="bh">β&#770;</span>'S (SIMULATED)</div>
+      <div class="num" id="sdB">–</div>
+      <div class="small">only a simulation can see this: it needs many samples</div>
+    </div>
+    <div class="readout">
+      <div class="lbl">SE STATA WOULD PRINT: LATEST SAMPLE</div>
+      <div class="num" id="seL">–</div>
+      <div class="small">estimated from one sample, with no re-runs</div>
+      <div class="agree" id="agree" style="display:none">✓ formula, Stata's SE and the simulation all agree</div>
+    </div>
+    <div class="msg" id="msg"></div>
+  </aside>
+
+  <section class="card bottom">
+    <h2>Distribution of the estimates <span class="bh">β&#770;</span></h2>
+    <p class="small">One entry per regression. Dashed red line: the true β. <strong>Hover over a bar</strong> to highlight those regression lines in the scatter above.</p>
+    <canvas id="hist"></canvas>
+  </section>
+</main>
+</div>
+
+<script>
+'use strict';
+// draw text containing β̂ on a canvas: the hat is placed correctly only by a math font
+function fillHat(g,txt,x,y){
+  if(txt.indexOf('β̂')<0){g.fillText(txt,x,y);return}
+  const parts=txt.split('β̂'), base=g.font, px=(base.match(/(\d+(\.\d+)?)px/)||[0,13])[1];
+  const hatFont=(base.match(/^(\d00)\s/)?base.match(/^(\d00)\s/)[1]+' ':'')+(+px+1.5)+'px "Cambria Math",Cambria,serif';
+  const wOf=(s,f)=>{g.font=f;const w=g.measureText(s).width;g.font=base;return w};
+  const hw=wOf('β̂',hatFont), total=parts.reduce((a,p)=>a+wOf(p,base),0)+hw*(parts.length-1);
+  const al=g.textAlign;let cx=al==='center'?x-total/2:(al==='right'||al==='end')?x-total:x;
+  g.textAlign='left';
+  parts.forEach((p,i)=>{g.fillText(p,cx,y);cx+=wOf(p,base);if(i<parts.length-1){g.font=hatFont;g.fillText('β̂',cx,y);g.font=base;cx+=hw}});
+  g.textAlign=al;
+}
+
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function gaussR(r){let u=0,v=0;while(u===0)u=r();while(v===0)v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+const gauss=()=>gaussR(Math.random);
+function fmt(x,d){return x.toLocaleString('en-GB',{minimumFractionDigits:d,maximumFractionDigits:d})}
+function pdf(z){return Math.exp(-z*z/2)/Math.sqrt(2*Math.PI)}
+function ctx2d(cv,h){
+  const dpr=window.devicePixelRatio||1, w=cv.clientWidth||600;
+  cv.width=w*dpr;cv.height=h*dpr;cv.style.height=h+'px';
+  const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);
+  return {g,w,h};
+}
+
+// ---------- the population model (calibrated to: reg log_w_wage year_ed, N = 165) ----------
+const A=5.31, B=0.046, XM=13;
+let N=165, SG=0.64, SX=2.9;
+const edu=z=>Math.max(0,Math.min(24,XM+SX*z));
+const seTheory=()=>SG/Math.sqrt(N*SX*SX);
+let cloud=[];
+function genCloud(){const r=mulberry32(5);cloud=[];for(let i=0;i<1500;i++){const x=edu(gaussR(r));cloud.push([x,A+B*x+SG*gaussR(r)])}}
+
+let slopes=[], lines=[], lastPts=null, lastLine=null, last=null, sumB=0, sumB2=0, sumSE=0;
+let hoverK=-1, hoverRange=null, pulseAmt=0;
+function drawSample(){
+  const xs=new Array(N), ys=new Array(N);let mx=0,my=0;
+  for(let i=0;i<N;i++){const x=edu(gauss());xs[i]=x;ys[i]=A+B*x+SG*gauss();mx+=x;my+=ys[i]}
+  mx/=N;my/=N;
+  let sxx=0,sxy=0;
+  for(let i=0;i<N;i++){const dx=xs[i]-mx;sxx+=dx*dx;sxy+=dx*(ys[i]-my)}
+  const b=sxy/sxx, a=my-b*mx;
+  let ssr=0;for(let i=0;i<N;i++){const e=ys[i]-a-b*xs[i];ssr+=e*e}
+  const se=Math.sqrt(ssr/(N-2)/sxx);
+  slopes.push(b);sumB+=b;sumB2+=b*b;sumSE+=se;
+  lines.push({a,b});if(lines.length>400)lines.shift();
+  lastPts=[xs,ys];lastLine={a,b};last={b,se};
+}
+
+// ---------- scatter ----------
+const plot=document.getElementById('plot'), hist=document.getElementById('hist');
+const PH=440, HH=250;
+const X0=0,X1=24,Y0=3.4,Y1=8.4, M={l:52,r:14,t:12,b:42};
+const sx=(x,w)=>M.l+(x-X0)/(X1-X0)*(w-M.l-M.r);
+const sy=(y,h)=>h-M.b-(y-Y0)/(Y1-Y0)*(h-M.b-M.t);
+function drawPlot(){
+  const {g,w,h}=ctx2d(plot,PH);g.clearRect(0,0,w,h);
+  g.font='12px "Segoe UI",sans-serif';g.textAlign='center';g.textBaseline='top';
+  for(let x=0;x<=24;x+=4){const p=sx(x,w);g.strokeStyle='#eef0f2';g.beginPath();g.moveTo(p,M.t);g.lineTo(p,h-M.b);g.stroke();g.fillStyle='#6b7280';g.fillText(x,p,h-M.b+8)}
+  g.textAlign='right';g.textBaseline='middle';
+  for(let y=4;y<=8;y+=1){const p=sy(y,h);g.strokeStyle='#eef0f2';g.beginPath();g.moveTo(M.l,p);g.lineTo(w-M.r,p);g.stroke();g.fillStyle='#6b7280';g.fillText(y,M.l-9,p)}
+  g.strokeStyle='#c9ccd2';g.strokeRect(M.l,M.t,w-M.l-M.r,h-M.t-M.b);
+  g.fillStyle='#374151';g.font='600 13px "Segoe UI",sans-serif';g.textAlign='center';g.textBaseline='alphabetic';
+  g.fillText('Years of education',(M.l+w-M.r)/2,h-8);
+  g.save();g.translate(15,(M.t+h-M.b)/2);g.rotate(-Math.PI/2);g.fillText('Log weekly wage',0,0);g.restore();
+  g.save();g.beginPath();g.rect(M.l,M.t,w-M.l-M.r,h-M.t-M.b);g.clip();
+  g.fillStyle='rgba(120,126,138,.25)';
+  for(const [x,y] of cloud){g.beginPath();g.arc(sx(x,w),sy(y,h),1.6,0,7);g.fill()}
+  for(const f of lines){
+    const hot=hoverRange&&f.b>=hoverRange[0]&&f.b<hoverRange[1];
+    g.lineWidth=hot?2.2:1.3;g.strokeStyle=hot?'rgba(234,140,31,.85)':'rgba(37,99,235,.07)';
+    g.beginPath();g.moveTo(sx(X0,w),sy(f.a+f.b*X0,h));g.lineTo(sx(X1,w),sy(f.a+f.b*X1,h));g.stroke();
+  }
+  g.strokeStyle='#dc2626';g.lineWidth=2;g.setLineDash([7,5]);
+  g.beginPath();g.moveTo(sx(X0,w),sy(A+B*X0,h));g.lineTo(sx(X1,w),sy(A+B*X1,h));g.stroke();g.setLineDash([]);
+  if(lastPts){
+    const [xs,ys]=lastPts, r=(N>400?2.2:3.2)+pulseAmt*2.5;
+    g.fillStyle='#2563eb';
+    for(let i=0;i<xs.length;i++){g.beginPath();g.arc(sx(xs[i],w),sy(ys[i],h),r,0,7);g.fill()}
+    g.strokeStyle='rgba(29,78,216,.95)';g.lineWidth=2.6;
+    g.beginPath();g.moveTo(sx(X0,w),sy(lastLine.a+lastLine.b*X0,h));g.lineTo(sx(X1,w),sy(lastLine.a+lastLine.b*X1,h));g.stroke();
+  }
+  g.restore();
+  // legend
+  g.font='12.5px "Segoe UI",sans-serif';g.textAlign='left';g.textBaseline='middle';
+  const lx=M.l+12;let ly=M.t+14;
+  g.strokeStyle='#dc2626';g.setLineDash([6,4]);g.lineWidth=2;g.beginPath();g.moveTo(lx,ly);g.lineTo(lx+26,ly);g.stroke();g.setLineDash([]);
+  g.fillStyle='#374151';g.fillText('population line: log wage = 5.31 + 0.046 × education',lx+32,ly);
+  ly+=18;g.strokeStyle='rgba(29,78,216,.95)';g.lineWidth=2.4;g.beginPath();g.moveTo(lx,ly);g.lineTo(lx+26,ly);g.stroke();
+  g.fillText('OLS line in the latest sample of N = '+N,lx+32,ly);
+}
+
+// ---------- histogram of beta-hat ----------
+const NB=46, HM={l:50,r:14,t:16,b:36};
+function histRange(){const s=seTheory();return {lo:B-4.5*s,hi:B+4.5*s}}
+function drawHist(){
+  const {g,w,h}=ctx2d(hist,HH);g.clearRect(0,0,w,h);
+  const m=HM, {lo,hi}=histRange(), bw=(hi-lo)/NB, bins=new Array(NB).fill(0);
+  let off=0;
+  for(const b of slopes){const k=Math.floor((b-lo)/bw);if(k>=0&&k<NB)bins[k]++;else off++}
+  const s=seTheory(), curve=v=>slopes.length*bw*pdf((v-B)/s)/s;
+  const showN=document.getElementById('chkNorm').checked&&slopes.length>0;
+  const maxC=Math.max(1,...bins,showN?curve(B):0);
+  const bx=v=>m.l+(v-lo)/(hi-lo)*(w-m.l-m.r), by=c=>h-m.b-c/maxC*(h-m.t-m.b);
+  g.strokeStyle='#c9ccd2';g.beginPath();g.moveTo(m.l,h-m.b);g.lineTo(w-m.r,h-m.b);g.stroke();
+  g.font='12px "Segoe UI",sans-serif';g.fillStyle='#6b7280';g.textAlign='center';g.textBaseline='top';
+  for(let i=0;i<=6;i++){const v=lo+(hi-lo)*i/6;g.fillText(v.toFixed(3),bx(v),h-m.b+6)}
+  g.fillStyle='#374151';g.font='600 12.5px "Segoe UI",sans-serif';g.textBaseline='alphabetic';
+  fillHat(g,'estimated return to schooling β̂',(m.l+w-m.r)/2,h-3);
+  for(let k=0;k<NB;k++){
+    if(!bins[k])continue;
+    const x=bx(lo+k*bw),x2=bx(lo+(k+1)*bw),y=by(bins[k]),hot=k===hoverK;
+    const gr=g.createLinearGradient(0,y,0,h-m.b);
+    gr.addColorStop(0,hot?'rgba(234,140,31,.95)':'rgba(59,130,246,.85)');
+    gr.addColorStop(1,hot?'rgba(217,119,6,.65)':'rgba(29,78,216,.5)');
+    g.fillStyle=gr;g.fillRect(x+0.5,y,Math.max(1,x2-x-1),h-m.b-y);
+  }
+  if(showN){
+    g.strokeStyle='#1c2330';g.lineWidth=2.2;g.beginPath();
+    for(let i=0;i<=260;i++){const v=lo+(hi-lo)*i/260;const y=by(curve(v));if(i===0)g.moveTo(bx(v),y);else g.lineTo(bx(v),y)}
+    g.stroke();
+    // ±1 SE markers
+    g.strokeStyle='#1c2330';g.lineWidth=1.2;g.setLineDash([3,3]);
+    for(const v of [B-s,B+s]){g.beginPath();g.moveTo(bx(v),by(curve(v)));g.lineTo(bx(v),h-m.b);g.stroke()}
+    g.setLineDash([]);
+    g.fillStyle='#1c2330';g.font='600 12px "Segoe UI",sans-serif';g.textAlign='left';g.textBaseline='top';
+    g.fillText('N(β, SE²) with SE = '+fmt(s,4)+'  (dotted: β ± 1 SE)',m.l+6,m.t-12);
+  }
+  if(hoverK>=0&&bins[hoverK]){
+    g.fillStyle='#c2570b';g.font='600 12.5px "Segoe UI",sans-serif';g.textAlign='right';g.textBaseline='top';
+    g.fillText(bins[hoverK]+' regression'+(bins[hoverK]>1?'s':'')+' landed here (highlighted above)',w-m.r,m.t-12);
+  }
+  g.strokeStyle='#dc2626';g.lineWidth=2;g.setLineDash([6,4]);
+  g.beginPath();g.moveTo(bx(B),m.t);g.lineTo(bx(B),h-m.b);g.stroke();g.setLineDash([]);
+  g.fillStyle='#dc2626';g.font='600 12px "Segoe UI",sans-serif';g.textAlign='left';g.textBaseline='top';
+  g.fillText(' true β = 0.046',bx(B)+3,m.t+4);
+  if(off>0){g.fillStyle='#6b7280';g.font='11.5px "Segoe UI",sans-serif';g.textAlign='right';g.textBaseline='bottom';g.fillText(off+' outside the view',w-m.r,h-m.b-4)}
+}
+
+// ---------- readouts ----------
+let lastChange='';
+function updateReadouts(){
+  const k=slopes.length, s=seTheory();
+  document.getElementById('nVal').textContent=N;
+  document.getElementById('sgVal').textContent=fmt(SG,2);
+  document.getElementById('sxVal').textContent=fmt(SX,1)+' yrs';
+  document.getElementById('fS').textContent=fmt(SG,2);
+  document.getElementById('fD').textContent='√('+N+' × '+fmt(SX*SX,2)+')';
+  document.getElementById('fSE').textContent=fmt(s,4);
+  document.getElementById('count').textContent=k.toLocaleString();
+  const m=k?sumB/k:0, sd=k>1?Math.sqrt(Math.max(0,(sumB2-k*m*m)/(k-1))):0;
+  document.getElementById('meanB').textContent=k?fmt(m,4):'–';
+  document.getElementById('sdB').textContent=k>1?fmt(sd,4):'–';
+  document.getElementById('seL').textContent=last?fmt(last.se,4):'–';
+  document.getElementById('agree').style.display=(k>=300&&Math.abs(sd-s)/s<0.07&&Math.abs(sumSE/k-s)/s<0.07)?'block':'none';
+  const msg=document.getElementById('msg');
+  if(lastChange&&k===0)msg.innerHTML=lastChange+' Draw 1,000 samples to check it.';
+  else if(k===0)msg.innerHTML='Click <strong>Draw 1 sample</strong>. The blue dots are the men in your dataset, and the blue line is the OLS fit in <em>that</em> sample.';
+  else if(k<10)msg.innerHTML='A new sample gives a new line and a new <span class="bh">β&#770;</span>. The estimator is a <strong>random variable</strong>.';
+  else if(k<300)msg.innerHTML='The <span class="bh">β&#770;</span>\'s pile up <strong>around the true β</strong>: on average OLS gets it right. Draw 1,000 to see the shape.';
+  else msg.innerHTML='A bell curve centred on β, with SD ≈ '+fmt(sd,4)+'. That matches the formula ('+fmt(s,4)+') and the SE from a single sample. Now move a slider: <strong>more data</strong>, <strong>less noise</strong> or <strong>more variation in education</strong> each make the SE smaller.';
+}
+function drawAll(){drawPlot();drawHist();updateReadouts()}
+
+// ---------- animation ----------
+function popEl(el){el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop')}
+function startPulse(){
+  const t0=performance.now(),T=450;
+  (function step(t){const u=Math.min(1,(t-t0)/T);pulseAmt=1-u;drawPlot();if(u<1)requestAnimationFrame(step);else{pulseAmt=0;drawPlot()}})(t0);
+}
+function flyDot(){
+  const pr=plot.getBoundingClientRect(), hr=hist.getBoundingClientRect(), w=plot.clientWidth||600;
+  const x0=pr.left+sx(XM,w), y0=pr.top+sy(lastLine.a+lastLine.b*XM,PH);
+  const {lo,hi}=histRange(), v=Math.max(lo,Math.min(hi,lastLine.b));
+  const x1=hr.left+HM.l+(v-lo)/(hi-lo)*((hist.clientWidth||600)-HM.l-HM.r), y1=hr.top+HH-HM.b-6;
+  const d=document.createElement('div');
+  d.style.cssText='position:fixed;z-index:99;width:12px;height:12px;border-radius:50%;background:#ea8c1f;box-shadow:0 0 12px rgba(234,140,31,.85);pointer-events:none';
+  document.body.appendChild(d);
+  const t0=performance.now(),T=650;
+  (function step(t){const u=Math.min(1,(t-t0)/T);d.style.left=(x0+(x1-x0)*u-6)+'px';d.style.top=(y0+(y1-y0)*u*u-6)+'px';
+    if(u<1)requestAnimationFrame(step);else{d.remove();drawHist();updateReadouts()}})(t0);
+}
+let running=false;
+function runBatch(k){
+  if(running)return;running=true;let done=0;
+  (function step(){const m=Math.min(k>200?40:10,k-done);for(let i=0;i<m;i++)drawSample();done+=m;drawAll();
+    if(done<k)requestAnimationFrame(step);else running=false})();
+}
+function resetAll(){slopes=[];lines=[];lastPts=null;lastLine=null;last=null;sumB=0;sumB2=0;sumSE=0;hoverK=-1;hoverRange=null;drawAll()}
+
+// ---------- controls ----------
+document.getElementById('b1').addEventListener('click',()=>{
+  if(running)return;lastChange='';
+  drawSample();popEl(document.getElementById('count'));updateReadouts();startPulse();flyDot();
+});
+document.getElementById('b100').addEventListener('click',()=>{lastChange='';runBatch(100)});
+document.getElementById('b1000').addEventListener('click',()=>{lastChange='';runBatch(1000)});
+document.getElementById('bReset').addEventListener('click',()=>{if(!running)resetAll()});
+document.getElementById('chkNorm').addEventListener('change',drawHist);
+
+const nEl=document.getElementById('n'), sgEl=document.getElementById('sg'), sxEl=document.getElementById('sx');
+function onSlider(what){
+  if(running)return;
+  const before=seTheory();
+  N=+nEl.value;SG=+sgEl.value;SX=+sxEl.value;
+  const after=seTheory(), ratio=after/before;
+  const dir=ratio<1?'<strong>falls</strong>':'<strong>rises</strong>';
+  const why={n:'the sample size N',sg:'the noise σ',sx:'the variation in education'}[what];
+  lastChange='You changed '+why+': the SE '+dir+' from '+fmt(before,4)+' to '+fmt(after,4)+' (×'+fmt(ratio,2)+').'+
+    (what==='n'?' Quadrupling N only halves the SE, because N sits under a square root.':
+     what==='sg'?' σ sits in the numerator, so the SE is proportional to it.':' More spread in X gives the line more leverage, so the slope is pinned down better.');
+  if(what!=='n')genCloud();
+  resetAll();
+}
+nEl.addEventListener('input',()=>onSlider('n'));
+sgEl.addEventListener('input',()=>onSlider('sg'));
+sxEl.addEventListener('input',()=>onSlider('sx'));
+document.getElementById('bDefault').addEventListener('click',()=>{
+  if(running)return;nEl.value=165;sgEl.value=0.64;sxEl.value=2.9;N=165;SG=0.64;SX=2.9;lastChange='';genCloud();resetAll();
+});
+
+function clearHover(){if(hoverK>=0){hoverK=-1;hoverRange=null;drawPlot();drawHist()}}
+hist.addEventListener('mousemove',e=>{
+  if(slopes.length<2){clearHover();return}
+  const w=hist.clientWidth||600, {lo,hi}=histRange(), bw=(hi-lo)/NB;
+  const v=lo+(e.offsetX-HM.l)/(w-HM.l-HM.r)*(hi-lo), k=Math.floor((v-lo)/bw);
+  if(k<0||k>=NB){clearHover();return}
+  if(k!==hoverK){hoverK=k;hoverRange=[lo+k*bw,lo+(k+1)*bw];drawPlot();drawHist()}
+});
+hist.addEventListener('mouseleave',clearHover);
+window.addEventListener('resize',drawAll);
+
+// ---------- init (?auto=1000&norm for screenshots) ----------
+const q=new URLSearchParams(location.search);
+if(q.has('norm'))document.getElementById('chkNorm').checked=true;
+genCloud();
+if(q.has('auto'))for(let i=0;i<(+q.get('auto')||0);i++)drawSample();
+drawAll();
+</script>
+</body>
+</html>

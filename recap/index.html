@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Econometrics Recap — Simulations</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#f6f6f3;color:#1c2330;line-height:1.55}
+  .wrap{max-width:1000px;margin:0 auto;padding:44px 20px 80px}
+  .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#2563eb;font-weight:600}
+  h1{font-size:34px;margin:4px 0 10px;letter-spacing:-.01em}
+  .sub{color:#5b6472;max-width:780px;margin-bottom:30px;font-size:16px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  a.card{display:block;background:#fff;border:1px solid #e7e8ea;border-radius:16px;box-shadow:0 1px 2px rgba(16,24,40,.05);
+    padding:22px;text-decoration:none;color:inherit;transition:all .18s}
+  a.card:hover{border-color:#2563eb;box-shadow:0 4px 14px rgba(37,99,235,.13);transform:translateY(-2px)}
+  .num{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 6px;border-radius:10px;
+    background:#2563eb;color:#fff;font-weight:700;font-size:17px;margin-bottom:12px}
+  a.card h2{font-size:19px;margin-bottom:6px}
+  a.card p{font-size:14px;color:#5b6472}
+  .when{margin-top:12px;font-size:12.5px;color:#1d4ed8;background:#eff4ff;border-radius:7px;padding:5px 10px;display:inline-block;font-weight:600}
+  .tips{margin-top:40px;background:#fff;border:1px solid #e7e8ea;border-radius:16px;padding:24px 26px}
+  .tips h2{font-size:20px;margin-bottom:10px}
+  .tips ul{margin-left:20px;font-size:14.5px;display:grid;gap:6px}
+  .bh{font-family:'Cambria Math',Cambria,Georgia,serif}
+  @media(max-width:760px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">Econometrics · Recap lecture</div>
+  <h1>Statistics and OLS: interactive simulations</h1>
+  <p class="sub">These simulations go with the recap lecture. They follow the lecture's running example: education and earnings in the CPS,
+  and our Stata regression <em>reg log_w_wage year_ed</em> (N = 165, <span class="bh">β&#770;</span> = 0.046, SE = 0.017).
+  Each page opens with step-by-step instructions and the key idea to take away.</p>
+
+  <div class="grid">
+    <a class="card" href="1_law_of_large_numbers.html">
+      <span class="num">1</span>
+      <h2>The law of large numbers</h2>
+      <p>Draw people one at a time from a skewed earnings population and watch the sample average settle on the population mean. With five researchers, every path is different, but all of them get there.</p>
+      <span class="when">Lecture topic: Law of large numbers</span>
+    </a>
+    <a class="card" href="2_find_the_best_line.html">
+      <span class="num">2</span>
+      <h2>Find the best line</h2>
+      <p>Drag a line through 40 men's education and earnings and try to make the sum of squared residuals as small as possible. Then reveal the OLS line and compare.</p>
+      <span class="when">Lecture topic: How does OLS find the line?</span>
+    </a>
+    <a class="card" href="3_sampling_and_clt.html">
+      <span class="num">3</span>
+      <h2>Sampling variation and the CLT</h2>
+      <p>Every sample has a different average. Draw 1,000 samples at n = 1, 5, 30 and 500: the histogram of averages turns into a bell curve with spread σ/√n, whatever the population looks like.</p>
+      <span class="when">Lecture topic: The central limit theorem</span>
+    </a>
+    <a class="card" href="3b_slope_sampling_and_clt.html">
+      <span class="num">3b</span>
+      <h2>One sample, one slope</h2>
+      <p>Draw a new sample of men and run the regression again. Same population, same regression, but a different <span class="bh">β&#770;</span> every time.</p>
+      <span class="when">Lecture topic: Sampling variation</span>
+    </a>
+    <a class="card" href="4_ols_sampling_distribution.html">
+      <span class="num">4</span>
+      <h2>The sampling distribution of <span class="bh">β&#770;</span></h2>
+      <p>Repeat the regression on 1,000 samples. The <span class="bh">β&#770;</span>'s form a normal curve centred on β, with spread equal to the standard error. Sliders show what makes the SE smaller.</p>
+      <span class="when">Lecture topic: <span class="bh">β&#770;</span> ~ N(β, SE²)</span>
+    </a>
+    <a class="card" href="5_hypothesis_testing.html">
+      <span class="num">5</span>
+      <h2>t-statistics, p-values and power</h2>
+      <p>With the true β = 0, about 5% of studies are "significant", and all of them are false positives. Load our Stata result to see t = 2.71 and p = 0.007 as shaded tails.</p>
+      <span class="when">Lecture topic: Hypothesis testing</span>
+    </a>
+    <a class="card" href="6_confidence_intervals.html">
+      <span class="num">6</span>
+      <h2>What "95% confident" means</h2>
+      <p>100 studies, 100 intervals, one fixed truth. About 95 of them contain the true β. Our Stata interval [0.012, 0.079] is shown on top.</p>
+      <span class="when">Lecture topic: Confidence intervals</span>
+    </a>
+  </div>
+
+  <div class="tips">
+    <h2>Tips</h2>
+    <ul>
+      <li>Everything runs in your browser, with nothing to install. A laptop or tablet works best.</li>
+      <li>The populations are simulated, so, unlike in real research, we know the true values (μ and β) and can check how close the estimates get.</li>
+      <li>You can't break anything: reload the page at any time to start again.</li>
+      <li>The numbers change every time you run a simulation. That is the point: they come from random samples.</li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>1 · Law of Large Numbers — Econometrics Recap</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:#1c2330;line-height:1.5;
+       background:radial-gradient(1100px 520px at 85% -8%,#e8efff 0%,rgba(232,239,255,0) 60%),
+                  radial-gradient(900px 500px at -10% 110%,#fdf3e4 0%,rgba(253,243,228,0) 55%),#f6f6f3}
+  .wrap{max-width:1180px;margin:0 auto;padding:22px 20px 60px}
+  nav a{color:#2563eb;text-decoration:none;font-size:14px}
+  nav a:hover{text-decoration:underline}
+  .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#2563eb;font-weight:600;margin-top:8px}
+  h1{font-size:30px;margin:2px 0 6px;letter-spacing:-.01em}
+  h2{font-size:15.5px;margin-bottom:2px}
+  .sub{color:#5b6472;max-width:900px;margin-bottom:18px}
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
+  .card{background:#fff;border:1px solid #e7e8ea;border-radius:14px;box-shadow:0 1px 2px rgba(16,24,40,.05);padding:18px}
+  canvas{width:100%;display:block}
+  .small{font-size:13px;color:#5b6472}
+  .btn{border:1px solid #d4d6da;background:#fff;color:#1c2330;border-radius:9px;padding:8px 12px;font-size:13.5px;font-weight:600;cursor:pointer;transition:all .15s}
+  .btn:hover{border-color:#9aa0aa;background:#fafafa;transform:translateY(-1px);box-shadow:0 3px 8px rgba(16,24,40,.10)}
+  .btn.primary{background:linear-gradient(135deg,#3b82f6,#1d4fd7);border-color:#1d4fd7;color:#fff}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btnrow{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 14px}
+  .seg{display:flex;border:1px solid #d4d6da;border-radius:10px;overflow:hidden;margin-bottom:14px}
+  .seg button{flex:1;border:0;background:#fff;padding:9px 4px;font-size:13px;font-weight:600;cursor:pointer;color:#5b6472}
+  .seg button.on{background:#2563eb;color:#fff}
+  .chk{display:flex;align-items:center;gap:8px;font-size:13.5px;margin-bottom:14px;cursor:pointer}
+  .readout{background:#f6f8ff;border:1px solid #dbe4ff;border-radius:11px;padding:10px 14px;margin-bottom:10px}
+  .readout .lbl{font-size:11.5px;letter-spacing:.08em;color:#5b6472;font-weight:600}
+  .readout .num{font-size:23px;font-weight:700;font-variant-numeric:tabular-nums}
+  .readout.hero{background:#fff7ed;border-color:#fde2bf}
+  .readout.hero .num{color:#c2570b}
+  .readout.win{background:#fef2f2;border-color:#fbd5d5}
+  .readout.win .num{color:#b91c1c}
+  .msg{border-radius:11px;padding:11px 13px;font-size:13.5px;background:#fbfbf9;border:1px dashed #d4d6da}
+  @media(max-width:900px){.layout{grid-template-columns:1fr}}
+  .howto{background:#fff;border:1px solid #e7e8ea;border-left:4px solid #2563eb;border-radius:12px;padding:10px 18px;margin:-4px 0 18px;box-shadow:0 1px 2px rgba(16,24,40,.05)}
+  .howto summary{cursor:pointer;font-weight:700;font-size:14.5px;color:#1d4ed8;padding:2px 0}
+  .howto ol{margin:8px 0 4px 22px;font-size:14px;display:grid;gap:4px}
+  .howto .key{margin:10px 0 4px;padding-top:9px;border-top:1px solid #f0f1f3;font-size:14px}
+  .howto .key b{color:#b91c1c}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <nav><a href="index.html">← All simulations</a></nav>
+  <div class="kicker">Econometrics · Recap · Simulation 1</div>
+  <h1>The law of large numbers</h1>
+  <p class="sub">The top chart is a made-up <strong>population</strong>: the annual earnings of 20,000 people. Like real earnings data, it is skewed, and 15% of people earn nothing.
+  Because we built it, we know its true mean <span style="color:#b91c1c;font-weight:600">μ = E[Y]</span>. In real life we only see a sample. How close does the <strong>sample average Ȳ</strong> get to μ?</p>
+  <details class="howto" open>
+    <summary>How to use this simulation</summary>
+    <ol>
+      <li>Click <strong>Draw 1 person</strong> a few times. Each click adds one randomly chosen person (blue arrow in the top chart) and updates the average Ȳ on the right. With only a few people, Ȳ jumps around a lot.</li>
+      <li>Click <strong>+10</strong> and <strong>+100</strong>. In the bottom chart, the blue line is Ȳ as the sample grows. Its swings get smaller.</li>
+      <li>Click <strong>Run to n = 10,000</strong>. Ȳ settles on the red dashed line, μ. The blue outline in the top chart (the sample) also takes the shape of the population.</li>
+      <li>Switch to <strong>5 researchers</strong> and run again. Each researcher gets a different sample and a different path, but all five end up at μ.</li>
+      <li>Tick <strong>Show the LLN funnel</strong>. About 95% of sample averages fall inside the shaded band, and the band narrows as n grows.</li>
+    </ol>
+    <p class="key"><b>Key idea:</b> with a large enough random sample, the sample average Ȳ gets as close as we like to the population mean E[Y]. This is the law of large numbers.</p>
+  </details>
+</header>
+
+<main class="layout">
+  <section class="card">
+    <h2>Population: annual earnings of 20,000 people</h2>
+    <canvas id="pop"></canvas>
+    <div class="small" id="popLegend" style="margin-top:4px">&nbsp;</div>
+    <h2 style="margin-top:16px">The sample average Ȳ as the sample grows <span class="small" style="font-weight:400">(horizontal axis on a log scale)</span></h2>
+    <canvas id="path"></canvas>
+  </section>
+
+  <aside class="card">
+    <div class="seg" id="segR">
+      <button data-r="1" class="on">1 researcher</button>
+      <button data-r="5">5 researchers</button>
+    </div>
+    <div class="btnrow">
+      <button class="btn primary" id="d1">Draw 1 person</button>
+      <button class="btn" id="d10">+10</button>
+      <button class="btn" id="d100">+100</button>
+      <button class="btn" id="dAll">Run to n = 10,000</button>
+      <button class="btn" id="reset">Reset</button>
+    </div>
+    <label class="chk"><input type="checkbox" id="sampleDist" checked> Show the blue researcher's sample distribution</label>
+    <label class="chk"><input type="checkbox" id="funnel"> Show the LLN funnel: μ ± 2σ/√n</label>
+
+    <div class="readout">
+      <div class="lbl">PEOPLE IN EACH SAMPLE (n)</div>
+      <div class="num" id="nOut">0</div>
+    </div>
+    <div class="readout hero">
+      <div class="lbl">SAMPLE AVERAGE Ȳ (BLUE RESEARCHER)</div>
+      <div class="num" id="mOut">–</div>
+      <div class="small" id="lastOut">&nbsp;</div>
+    </div>
+    <div class="readout win">
+      <div class="lbl">POPULATION MEAN μ = E[Y]</div>
+      <div class="num" id="muOut"></div>
+      <div class="small">we only know this because we built the population</div>
+    </div>
+    <div class="msg" id="msg"></div>
+  </aside>
+</main>
+</div>
+
+<script>
+'use strict';
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function gaussR(r){let u=0,v=0;while(u===0)u=r();while(v===0)v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+function fmt(x,d){return x.toLocaleString('en-GB',{minimumFractionDigits:d,maximumFractionDigits:d})}
+function money(k){return '$'+Math.round(k*1000).toLocaleString('en-US')}
+function ctx2d(cv,h){
+  const dpr=window.devicePixelRatio||1, w=cv.clientWidth||600;
+  cv.width=w*dpr;cv.height=h*dpr;cv.style.height=h+'px';
+  const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);
+  return {g,w,h};
+}
+
+// ---------- population: annual earnings in $1000s ----------
+const NPOP=20000, CAP=100;
+let pop=[], mu=0, sigma=0;
+(function genPop(){
+  const r=mulberry32(2026);
+  for(let i=0;i<NPOP;i++){
+    let y=0;
+    if(r()>=0.15)y=Math.min(CAP,Math.exp(Math.log(17)+0.62*gaussR(r)));
+    pop.push(y);
+  }
+  mu=pop.reduce((a,b)=>a+b,0)/NPOP;
+  sigma=Math.sqrt(pop.reduce((a,b)=>a+(b-mu)**2,0)/NPOP);
+})();
+
+// ---------- state ----------
+const COLS=['#2563eb','#ea8c1f','#7c3aed','#0d9488','#db2777'];
+const NMAX=10000;
+const NB=40, bw=CAP/NB;
+function binOf(y){return Math.min(NB-1,Math.floor(y/bw))}
+let R=1, paths=[], recent=[], sampleBins=new Array(NB).fill(0);
+function newPaths(){paths=[];for(let k=0;k<R;k++)paths.push({sum:0,n:0,pts:[]});recent=[];sampleBins=new Array(NB).fill(0)}
+function drawOne(){
+  for(let k=0;k<paths.length;k++){
+    const p=paths[k];
+    if(p.n>=NMAX)continue;
+    const y=pop[Math.floor(Math.random()*NPOP)];
+    p.sum+=y;p.n++;p.pts.push(p.sum/p.n);
+    if(k===0){recent.push(y);if(recent.length>12)recent.shift();sampleBins[binOf(y)]++}
+  }
+}
+
+// ---------- drawing ----------
+const popCv=document.getElementById('pop'), pathCv=document.getElementById('path');
+const PH=190, QH=380;
+
+function drawPop(){
+  const {g,w,h}=ctx2d(popCv,PH);
+  g.clearRect(0,0,w,h);
+  const m={l:50,r:34,t:22,b:28};
+  // heights are shares of people in each bin, so population and sample share one scale
+  const bins=new Array(NB).fill(0);
+  for(const y of pop){bins[binOf(y)]++}
+  const popShare=bins.map(c=>c/NPOP), maxS=Math.max(...popShare)*1.1;
+  const bx=v=>m.l+v/CAP*(w-m.l-m.r);
+  const by=s=>h-m.b-Math.min(1,s/maxS)*(h-m.t-m.b);
+  g.font='12px "Segoe UI",sans-serif';g.fillStyle='#6b7280';g.textAlign='center';g.textBaseline='top';
+  for(let v=0;v<=100;v+=20){g.fillText(money(v),bx(v),h-m.b+8)}
+  for(let k=0;k<NB;k++){
+    const x0=bx(k*bw),x1=bx((k+1)*bw),y=by(popShare[k]);
+    g.fillStyle='rgba(120,126,138,.45)';
+    g.fillRect(x0+0.5,y,Math.max(1,x1-x0-1),h-m.b-y);
+  }
+  g.strokeStyle='#c9ccd2';g.beginPath();g.moveTo(m.l,h-m.b);g.lineTo(w-m.r,h-m.b);g.stroke();
+  // sample distribution of the blue researcher (bars above the scale are clipped and marked)
+  const n0=paths.length?paths[0].n:0, showS=document.getElementById('sampleDist').checked&&n0>0;
+  if(showS){
+    for(let k=0;k<NB;k++){
+      if(!sampleBins[k])continue;
+      const s=sampleBins[k]/n0, x0=bx(k*bw),x1=bx((k+1)*bw),y=by(s);
+      g.fillStyle='rgba(37,99,235,.14)';g.fillRect(x0+0.5,y,Math.max(1,x1-x0-1),h-m.b-y);
+      g.strokeStyle='#2563eb';g.lineWidth=1.4;g.strokeRect(x0+0.5,y,Math.max(1,x1-x0-1),h-m.b-y);
+      if(s>maxS){
+        g.fillStyle='#2563eb';g.beginPath();const xc=(x0+x1)/2;
+        g.moveTo(xc,m.t-1);g.lineTo(xc-4,m.t+6);g.lineTo(xc+4,m.t+6);g.closePath();g.fill();
+      }
+    }
+    const ybar=paths[0].sum/n0;
+    g.strokeStyle='#2563eb';g.lineWidth=2;g.setLineDash([3,3]);
+    g.beginPath();g.moveTo(bx(ybar),m.t);g.lineTo(bx(ybar),h-m.b);g.stroke();g.setLineDash([]);
+    g.fillStyle='#1d4ed8';g.font='600 12.5px "Segoe UI",sans-serif';g.textAlign='right';g.textBaseline='top';
+    g.fillText('Ȳ = '+money(ybar)+' ',bx(ybar)-3,m.t+32);
+  }
+  g.lineWidth=1;
+  // mu
+  g.strokeStyle='#dc2626';g.lineWidth=2;g.setLineDash([6,4]);
+  g.beginPath();g.moveTo(bx(mu),m.t);g.lineTo(bx(mu),h-m.b);g.stroke();g.setLineDash([]);
+  g.fillStyle='#dc2626';g.font='600 12.5px "Segoe UI",sans-serif';g.textAlign='left';g.textBaseline='top';
+  g.fillText(' μ = '+money(mu),bx(mu)+3,m.t+14);
+  g.fillStyle='#5b6472';g.font='12px "Segoe UI",sans-serif';g.textAlign='left';g.textBaseline='bottom';
+  g.fillText('← tall bar at $0: 15% not employed that year',bx(bw)+6,m.t-4);
+  // recent draws of researcher 1: arrows pointing down onto the axis
+  for(let i=0;i<recent.length;i++){
+    const a=(i+1)/recent.length, x=bx(recent[i]), tip=h-m.b-1;
+    g.fillStyle='rgba(37,99,235,'+(0.15+0.85*a)+')';
+    g.beginPath();g.moveTo(x,tip);g.lineTo(x-6,tip-11);g.lineTo(x+6,tip-11);g.closePath();g.fill();
+  }
+  if(recent.length){
+    const last=recent[recent.length-1];
+    g.fillStyle='#1d4ed8';g.font='600 12.5px "Segoe UI",sans-serif';g.textAlign='right';g.textBaseline='bottom';
+    g.fillText('▼ latest person drawn (blue researcher): '+money(last),w-m.r,m.t-4);
+  }
+}
+
+const YMAX=60;
+function drawPath(){
+  const {g,w,h}=ctx2d(pathCv,QH);
+  g.clearRect(0,0,w,h);
+  const m={l:62,r:18,t:12,b:40};
+  const L=Math.log10(NMAX);
+  const bx=n=>m.l+Math.log10(n)/L*(w-m.l-m.r);
+  const by=v=>h-m.b-Math.min(YMAX,Math.max(0,v))/YMAX*(h-m.t-m.b);
+  // grid
+  g.font='12px "Segoe UI",sans-serif';
+  for(const n of [1,10,100,1000,10000]){
+    g.strokeStyle='#eef0f2';g.beginPath();g.moveTo(bx(n),m.t);g.lineTo(bx(n),h-m.b);g.stroke();
+    g.fillStyle='#6b7280';g.textAlign='center';g.textBaseline='top';g.fillText(n.toLocaleString(),bx(n),h-m.b+8);
+  }
+  for(let v=0;v<=YMAX;v+=10){
+    g.strokeStyle='#eef0f2';g.beginPath();g.moveTo(m.l,by(v));g.lineTo(w-m.r,by(v));g.stroke();
+    g.fillStyle='#6b7280';g.textAlign='right';g.textBaseline='middle';g.fillText(money(v),m.l-8,by(v));
+  }
+  g.strokeStyle='#c9ccd2';g.strokeRect(m.l,m.t,w-m.l-m.r,h-m.t-m.b);
+  g.fillStyle='#374151';g.font='600 13px "Segoe UI",sans-serif';g.textAlign='center';g.textBaseline='alphabetic';
+  g.fillText('number of people in the sample, n',(m.l+w-m.r)/2,h-6);
+  // funnel
+  if(document.getElementById('funnel').checked){
+    g.beginPath();
+    for(let i=0;i<=200;i++){const n=Math.pow(10,L*i/200);const y=by(mu+2*sigma/Math.sqrt(n));if(i===0)g.moveTo(bx(n),y);else g.lineTo(bx(n),y)}
+    for(let i=200;i>=0;i--){const n=Math.pow(10,L*i/200);g.lineTo(bx(n),by(mu-2*sigma/Math.sqrt(n)))}
+    g.closePath();g.fillStyle='rgba(220,38,38,.08)';g.fill();
+    g.fillStyle='#b91c1c';g.font='12px "Segoe UI",sans-serif';g.textAlign='left';g.textBaseline='bottom';
+    g.fillText('about 95% of sample averages land inside this funnel',bx(3)+4,by(mu+2*sigma/Math.sqrt(3))-4);
+  }
+  // mu
+  g.strokeStyle='#dc2626';g.lineWidth=2;g.setLineDash([7,5]);
+  g.beginPath();g.moveTo(m.l,by(mu));g.lineTo(w-m.r,by(mu));g.stroke();g.setLineDash([]);
+  g.fillStyle='#dc2626';g.font='600 12.5px "Segoe UI",sans-serif';g.textAlign='right';g.textBaseline='bottom';
+  g.fillText('μ = '+money(mu),w-m.r-6,by(mu)-4);
+  // paths (researcher 1 drawn last, on top)
+  for(let k=paths.length-1;k>=0;k--){
+    const p=paths[k];if(!p.n)continue;
+    g.strokeStyle=COLS[k];g.lineWidth=k===0?2.4:1.7;g.globalAlpha=k===0?1:0.85;
+    g.beginPath();
+    for(let i=0;i<p.pts.length;i++){const x=bx(i+1),y=by(p.pts[i]);if(i===0)g.moveTo(x,y);else g.lineTo(x,y)}
+    g.stroke();g.globalAlpha=1;
+    const x=bx(p.n),y=by(p.pts[p.n-1]);
+    g.fillStyle=COLS[k];g.beginPath();g.arc(x,y,k===0?5:4,0,7);g.fill();
+    g.strokeStyle='#fff';g.lineWidth=1.3;g.stroke();
+  }
+}
+
+function updateReadouts(){
+  const p=paths[0];
+  document.getElementById('nOut').textContent=p.n.toLocaleString();
+  document.getElementById('mOut').textContent=p.n?money(p.sum/p.n):'–';
+  document.getElementById('lastOut').innerHTML=p.n?'off from μ by '+money(Math.abs(p.sum/p.n-mu)):'&nbsp;';
+  document.getElementById('muOut').textContent=money(mu);
+  const n=p.n, msg=document.getElementById('msg');
+  if(n===0)msg.innerHTML='Click <strong>Draw 1 person</strong>. Each click adds one randomly chosen person to the sample and updates the average.';
+  else if(n<10)msg.innerHTML='With only '+n+' '+(n===1?'person':'people')+', the average jumps around: a single person earning $0, or $100,000, moves it a lot.';
+  else if(n<300)msg.innerHTML='The swings are getting smaller. Each new person has weight 1/n in the average, so each one matters less and less.';
+  else{
+    let spread='';
+    if(paths.length>1){
+      const ms=paths.map(q=>q.sum/q.n);
+      spread=' All '+paths.length+' researchers drew <em>different</em> samples, yet their averages are all within '+money(Math.max(...ms.map(v=>Math.abs(v-mu))))+' of μ.';
+    }
+    msg.innerHTML='<strong>That is the LLN:</strong> with a large enough sample, Ȳ gets as close to E[Y] as we like.'+spread+(paths.length===1?' Now try <strong>5 researchers</strong>.':'');
+  }
+  document.getElementById('popLegend').innerHTML=document.getElementById('sampleDist').checked
+    ?'<span style="color:#6b7280">■</span> grey bars: population &nbsp; <span style="color:#2563eb">□</span> blue outline: the blue researcher\'s sample (n = '+p.n.toLocaleString()+'), same share scale'
+      +(n>=1000?' — <strong>the sample now looks like the population</strong>':'')
+    :'&nbsp;';
+  document.getElementById('dAll').disabled=running||p.n>=NMAX;
+}
+function drawAll(){drawPop();drawPath();updateReadouts()}
+
+// ---------- interactions ----------
+let running=false;
+function add(k){for(let i=0;i<k;i++)drawOne();drawAll()}
+document.getElementById('d1').addEventListener('click',()=>{if(!running)add(1)});
+document.getElementById('d10').addEventListener('click',()=>{if(!running)add(10)});
+document.getElementById('d100').addEventListener('click',()=>{if(!running)add(100)});
+document.getElementById('dAll').addEventListener('click',()=>{
+  if(running)return;running=true;
+  (function step(){
+    const n=paths[0].n;
+    const k=Math.max(1,Math.floor(n*0.035));
+    for(let i=0;i<k;i++)drawOne();
+    drawAll();
+    if(paths[0].n<NMAX)requestAnimationFrame(step);else{running=false;updateReadouts()}
+  })();
+});
+document.getElementById('reset').addEventListener('click',()=>{if(running)return;newPaths();drawAll()});
+document.getElementById('funnel').addEventListener('change',drawAll);
+document.getElementById('sampleDist').addEventListener('change',drawAll);
+document.getElementById('segR').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b||running)return;
+  document.querySelectorAll('#segR button').forEach(x=>x.classList.toggle('on',x===b));
+  R=+b.dataset.r;newPaths();drawAll();
+});
+window.addEventListener('resize',drawAll);
+
+// ---------- init (?r=5&auto=500 pre-draws, e.g. for screenshots) ----------
+const q=new URLSearchParams(location.search);
+if(q.get('r')==='5'){R=5;document.querySelectorAll('#segR button').forEach(x=>x.classList.toggle('on',x.dataset.r==='5'))}
+if(q.has('funnel'))document.getElementById('funnel').checked=true;
+newPaths();
+if(q.has('auto'))for(let i=0;i<Math.min(NMAX,+q.get('auto')||0);i++)drawOne();
+drawAll();
+</script>
+</body>
+</html>

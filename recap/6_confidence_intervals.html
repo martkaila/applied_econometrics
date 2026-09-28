@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>6 · Confidence Intervals — Econometrics Recap</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:#1c2330;line-height:1.5;
+       background:radial-gradient(1100px 520px at 85% -8%,#e8efff 0%,rgba(232,239,255,0) 60%),
+                  radial-gradient(900px 500px at -10% 110%,#fdf3e4 0%,rgba(253,243,228,0) 55%),#f6f6f3}
+  .wrap{max-width:1180px;margin:0 auto;padding:22px 20px 60px}
+  nav a{color:#2563eb;text-decoration:none;font-size:14px}
+  nav a:hover{text-decoration:underline}
+  .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#2563eb;font-weight:600;margin-top:8px}
+  h1{font-size:30px;margin:2px 0 6px;letter-spacing:-.01em}
+  .sub{color:#5b6472;max-width:920px;margin-bottom:18px}
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:18px;align-items:start}
+  .card{background:#fff;border:1px solid #e7e8ea;border-radius:14px;box-shadow:0 1px 2px rgba(16,24,40,.05);padding:18px}
+  canvas{width:100%;display:block}
+  .small{font-size:13px;color:#5b6472}
+  .lbl2{font-size:13.5px;font-weight:600;margin-bottom:4px}
+  .ctl{margin-bottom:12px}
+  .ctl label{display:flex;justify-content:space-between;font-size:13.5px;font-weight:600;margin-bottom:3px}
+  .ctl label .val{font-weight:700;color:#2563eb;font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%;accent-color:#2563eb}
+  .btn{border:1px solid #d4d6da;background:#fff;color:#1c2330;border-radius:9px;padding:8px 12px;font-size:13.5px;font-weight:600;cursor:pointer;transition:all .15s}
+  .btn:hover{border-color:#9aa0aa;background:#fafafa}
+  .btn.primary{background:linear-gradient(135deg,#3b82f6,#1d4fd7);border-color:#1d4fd7;color:#fff}
+  .seg{display:flex;border:1px solid #d4d6da;border-radius:10px;overflow:hidden;margin-bottom:12px}
+  .seg button{flex:1;border:0;background:#fff;padding:8px 0;font-size:13.5px;font-weight:600;cursor:pointer;color:#5b6472}
+  .seg button+button{border-left:1px solid #eceef1}
+  .seg button.on{background:#2563eb;color:#fff}
+  .chk{display:flex;align-items:flex-start;gap:8px;font-size:13.5px;margin-bottom:12px;cursor:pointer}
+  .chk input{margin-top:4px}
+  .readout{background:#f6f8ff;border:1px solid #dbe4ff;border-radius:11px;padding:9px 14px;margin-bottom:9px}
+  .readout .lbl{font-size:11.5px;letter-spacing:.08em;color:#5b6472;font-weight:600;text-transform:uppercase}
+  .readout .num{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+  .readout.hero{background:#f2fbf5;border-color:#cdeed8}
+  .readout.hero .num{color:#15803d}
+  .readout.test{background:#f5f5f4;border-color:#dcdcd9}
+  .msg{background:#fbfbf9;border:1px dashed #d4d6da;border-radius:11px;padding:11px 13px;font-size:13.5px}
+  .bh{font-family:'Cambria Math',Cambria,Georgia,serif;font-style:normal}
+  @media(max-width:900px){.layout{grid-template-columns:1fr}}
+  .howto{background:#fff;border:1px solid #e7e8ea;border-left:4px solid #2563eb;border-radius:12px;padding:10px 18px;margin:-4px 0 18px;box-shadow:0 1px 2px rgba(16,24,40,.05)}
+  .howto summary{cursor:pointer;font-weight:700;font-size:14.5px;color:#1d4ed8;padding:2px 0}
+  .howto ol{margin:8px 0 4px 22px;font-size:14px;display:grid;gap:4px}
+  .howto .key{margin:10px 0 4px;padding-top:9px;border-top:1px solid #f0f1f3;font-size:14px}
+  .howto .key b{color:#b91c1c}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <nav><a href="index.html">← All simulations</a></nav>
+  <div class="kicker">Econometrics · Recap · Simulation 6</div>
+  <h1>What a 95% confidence interval really means</h1>
+  <p class="sub">100 research teams each draw their own sample of men and compute a confidence interval, <span class="bh">β&#770;</span> ± critical value × SE.
+  The true β (<span style="color:#b91c1c;font-weight:600">red dashed line</span>) never moves. The <strong>intervals</strong> move, because each comes from a random sample.
+  <span style="color:#c2570b;font-weight:600">Our interval from Stata</span> is shown at the top.</p>
+  <details class="howto" open>
+    <summary>How to use this simulation</summary>
+    <ol>
+      <li>Click <strong>Run 100 new studies</strong>. <span style="color:#15803d;font-weight:600">Green</span> intervals contain the true β, <span style="color:#dc2626;font-weight:600">red</span> ones miss it. Count the misses: about 5 out of 100.</li>
+      <li>Run it several times. The <strong>All runs</strong> box shows that, overall, about 95% of the intervals contain β.</li>
+      <li>Switch the <strong>confidence level</strong> to 80% and then 99%. How do the width of the intervals and the number of misses change?</li>
+      <li>Move <strong>N</strong>: the intervals get shorter, but the share of misses stays the same.</li>
+      <li>Tick <strong>Also test H₀: β = 0</strong>. The intervals that exclude 0 are exactly the studies that would reject H₀.</li>
+    </ol>
+    <p class="key"><b>Key idea:</b> "95% confident" describes the method: 95% of intervals built this way contain the true β. Any single interval, including ours, either contains β or it does not, and we cannot know which.</p>
+  </details>
+</header>
+
+<main class="layout">
+  <section class="card">
+    <canvas id="plot"></canvas>
+  </section>
+
+  <aside class="card">
+    <button class="btn primary" id="bRun" style="width:100%;margin-bottom:14px">Run 100 new studies</button>
+    <div class="lbl2">Confidence level</div>
+    <div class="seg" id="seg">
+      <button data-l="80">80%</button><button data-l="90">90%</button><button data-l="95" class="on">95%</button><button data-l="99">99%</button>
+    </div>
+    <div class="ctl">
+      <label>True β (return to schooling) <span class="val" id="bVal"></span></label>
+      <input type="range" id="beta" min="0" max="0.08" step="0.002" value="0.046">
+    </div>
+    <div class="ctl">
+      <label>Sample size N <span class="val" id="nVal"></span></label>
+      <input type="range" id="n" min="20" max="1000" step="5" value="165">
+    </div>
+    <label class="chk"><input type="checkbox" id="chkTest"> <span>Also test <strong>H₀: β = 0</strong>: mark the intervals that <em>exclude</em> 0</span></label>
+
+    <div class="readout hero">
+      <div class="lbl">This run: intervals containing the truth</div>
+      <div class="num" id="cover">– / 100</div>
+    </div>
+    <div class="readout">
+      <div class="lbl">All runs at these settings</div>
+      <div class="num" id="total">–</div>
+      <div class="small" id="totalPct"></div>
+    </div>
+    <div class="readout test" id="testBox" style="display:none">
+      <div class="lbl">Intervals excluding 0 = studies rejecting H₀</div>
+      <div class="num" id="excl">–</div>
+      <div class="small" id="exclNote"></div>
+    </div>
+    <div class="msg" id="msg"></div>
+  </aside>
+</main>
+</div>
+
+<script>
+'use strict';
+// draw text containing β̂ on a canvas: the hat is placed correctly only by a math font
+function fillHat(g,txt,x,y){
+  if(txt.indexOf('β̂')<0){g.fillText(txt,x,y);return}
+  const parts=txt.split('β̂'), base=g.font, px=(base.match(/(\d+(\.\d+)?)px/)||[0,13])[1];
+  const hatFont=(base.match(/^(\d00)\s/)?base.match(/^(\d00)\s/)[1]+' ':'')+(+px+1.5)+'px "Cambria Math",Cambria,serif';
+  const wOf=(s,f)=>{g.font=f;const w=g.measureText(s).width;g.font=base;return w};
+  const hw=wOf('β̂',hatFont), total=parts.reduce((a,p)=>a+wOf(p,base),0)+hw*(parts.length-1);
+  const al=g.textAlign;let cx=al==='center'?x-total/2:(al==='right'||al==='end')?x-total:x;
+  g.textAlign='left';
+  parts.forEach((p,i)=>{g.fillText(p,cx,y);cx+=wOf(p,base);if(i<parts.length-1){g.font=hatFont;g.fillText('β̂',cx,y);g.font=base;cx+=hw}});
+  g.textAlign=al;
+}
+
+function gaussR(r){let u=0,v=0;while(u===0)u=r();while(v===0)v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+const gauss=()=>gaussR(Math.random);
+function fmt(x,d){return x.toLocaleString('en-GB',{minimumFractionDigits:d,maximumFractionDigits:d})}
+// Student t critical values (exact coverage at any N)
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];
+  let y=x,tmp=x+5.5;tmp-=(x+0.5)*Math.log(tmp);let ser=1.000000000190015;for(let j=0;j<6;j++)ser+=c[j]/++y;return -tmp+Math.log(2.5066282746310005*ser/x)}
+function betacf(a,b,x){const FP=1e-300;let qab=a+b,qap=a+1,qam=a-1,c=1,d=1-qab*x/qap;if(Math.abs(d)<FP)d=FP;d=1/d;let h=d;
+  for(let m=1;m<=300;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<FP)d=FP;c=1+aa/c;if(Math.abs(c)<FP)c=FP;d=1/d;h*=d*c;
+    aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<FP)d=FP;c=1+aa/c;if(Math.abs(c)<FP)c=FP;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<3e-14)break}
+  return h}
+function ibeta(x,a,b){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));
+  return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b}
+const pTwo=(t,df)=>ibeta(df/(df+t*t),df/2,0.5);
+function tCrit(df,alpha){let lo=0,hi=60;for(let i=0;i<80;i++){const mid=(lo+hi)/2;if(pTwo(mid,df)>alpha)lo=mid;else hi=mid}return (lo+hi)/2}
+
+// ---------- model: same population as Simulations 4 and 5 ----------
+const A=5.31, XM=13, SX=2.9, SG=0.64;
+const STATA={b:0.0457963,se:0.016902,df:163};
+let lvl=95, N=165, trueB=0.046;
+let rows=[], shown=0, range=[0,0.1], totals={drawn:0,covered:0,excl:0};
+const crit=()=>tCrit(N-2,1-lvl/100);
+
+function oneStudy(c){
+  const xs=new Array(N),ys=new Array(N);let mx=0,my=0;
+  for(let i=0;i<N;i++){const x=Math.max(0,Math.min(24,XM+SX*gauss()));xs[i]=x;ys[i]=A+trueB*x+SG*gauss();mx+=x;my+=ys[i]}
+  mx/=N;my/=N;
+  let sxx=0,sxy=0;for(let i=0;i<N;i++){const dx=xs[i]-mx;sxx+=dx*dx;sxy+=dx*(ys[i]-my)}
+  const b=sxy/sxx,a=my-b*mx;
+  let ssr=0;for(let i=0;i<N;i++){const e=ys[i]-a-b*xs[i];ssr+=e*e}
+  const se=Math.sqrt(ssr/(N-2)/sxx), lo=b-c*se, hi=b+c*se;
+  return {b,lo,hi,cover:lo<=trueB&&trueB<=hi,excl:lo>0||hi<0};
+}
+function ours(){const c=tCrit(STATA.df,1-lvl/100);return {b:STATA.b,lo:STATA.b-c*STATA.se,hi:STATA.b+c*STATA.se}}
+
+function newRun(){
+  const c=crit();rows=[];
+  for(let i=0;i<100;i++)rows.push(oneStudy(c));
+  const o=ours();
+  let lo=Math.min(0,o.lo),hi=Math.max(0.08,o.hi);
+  for(const r of rows){lo=Math.min(lo,r.lo);hi=Math.max(hi,r.hi)}
+  const pad=(hi-lo)*0.05;range=[lo-pad,hi+pad];
+  shown=0;animate();
+}
+let animating=false;
+function animate(){
+  if(animating)return;animating=true;
+  (function step(){
+    shown=Math.min(rows.length,shown+3);draw();
+    if(shown<rows.length)requestAnimationFrame(step);
+    else{animating=false;totals.drawn+=rows.length;totals.covered+=rows.filter(r=>r.cover).length;totals.excl+=rows.filter(r=>r.excl).length;updateReadouts(true)}
+  })();
+}
+
+const plot=document.getElementById('plot'), PH=680;
+function draw(){
+  const dpr=window.devicePixelRatio||1, w=plot.clientWidth||600;
+  plot.width=w*dpr;plot.height=PH*dpr;plot.style.height=PH+'px';
+  const g=plot.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,PH);
+  const test=document.getElementById('chkTest').checked;
+  const m={l:24,r:24,t:98,b:40};
+  const bx=v=>m.l+(v-range[0])/(range[1]-range[0])*(w-m.l-m.r);
+  const rowH=(PH-m.t-m.b)/100;
+  // axis + grid
+  g.font='12px "Segoe UI",sans-serif';g.fillStyle='#6b7280';g.textAlign='center';g.textBaseline='top';
+  const span=range[1]-range[0], tick=span>0.3?0.05:span>0.12?0.02:0.01;
+  for(let v=Math.ceil(range[0]/tick)*tick;v<=range[1]+1e-9;v+=tick){
+    g.strokeStyle='#eef0f2';g.beginPath();g.moveTo(bx(v),m.t-8);g.lineTo(bx(v),PH-m.b);g.stroke();
+    g.fillText(fmt(v,2),bx(v),PH-m.b+8);
+  }
+  g.fillStyle='#374151';g.font='600 13px "Segoe UI",sans-serif';g.textBaseline='alphabetic';
+  fillHat(g,'estimated return to schooling β̂ with its '+lvl+'% confidence interval',(m.l+w-m.r)/2,PH-6);
+  // our Stata interval, pinned on top
+  const o=ours(), oy=34;
+  g.font='600 12.5px "Segoe UI",sans-serif';g.textBaseline='middle';g.fillStyle='#c2570b';g.textAlign='left';
+  g.fillText('Our CPS study from Stata: ['+fmt(o.lo,3)+', '+fmt(o.hi,3)+']. Does it contain the true β? We can never know.',m.l,12);
+  g.strokeStyle='#ea8c1f';g.lineWidth=5;g.lineCap='round';
+  g.beginPath();g.moveTo(bx(o.lo),oy);g.lineTo(bx(o.hi),oy);g.stroke();g.lineCap='butt';
+  g.fillStyle='#c2570b';g.beginPath();g.arc(bx(o.b),oy,5,0,7);g.fill();
+  g.fillStyle='#8a909c';g.font='12px "Segoe UI",sans-serif';g.textAlign='left';g.textBaseline='middle';
+  g.fillText('↓ 100 simulated studies (only the simulation knows the truth)',m.l,60);
+  // H0 line
+  if(test){
+    g.strokeStyle='#1c2330';g.lineWidth=1.6;g.setLineDash([3,4]);
+    g.beginPath();g.moveTo(bx(0),m.t-10);g.lineTo(bx(0),PH-m.b);g.stroke();g.setLineDash([]);
+    g.fillStyle='#1c2330';g.font='600 12px "Segoe UI",sans-serif';g.textAlign='right';g.textBaseline='bottom';
+    g.fillText('H₀: β = 0 ',bx(0)-2,m.t-10);
+  }
+  // truth
+  g.strokeStyle='#dc2626';g.lineWidth=2;g.setLineDash([6,4]);
+  g.beginPath();g.moveTo(bx(trueB),m.t-10);g.lineTo(bx(trueB),PH-m.b);g.stroke();g.setLineDash([]);
+  g.fillStyle='#dc2626';g.font='600 12.5px "Segoe UI",sans-serif';g.textAlign='left';g.textBaseline='bottom';
+  g.fillText(' true β = '+fmt(trueB,3),bx(trueB)+2,m.t-10);
+  // intervals
+  for(let i=0;i<shown;i++){
+    const r=rows[i], y=m.t+rowH*(i+0.5);
+    g.strokeStyle=r.cover?'rgba(21,128,61,.75)':'rgba(220,38,38,.95)';g.lineWidth=r.cover?1.6:2.4;
+    g.beginPath();g.moveTo(bx(r.lo),y);g.lineTo(bx(r.hi),y);g.stroke();
+    g.fillStyle=r.cover?'#15803d':'#dc2626';g.beginPath();g.arc(bx(r.b),y,r.cover?2.2:3,0,7);g.fill();
+    if(test&&r.excl){g.fillStyle='#1c2330';g.beginPath();g.arc(w-m.r+12,y,2.6,0,7);g.fill()}
+  }
+  if(test){g.fillStyle='#1c2330';g.font='11px "Segoe UI",sans-serif';g.textAlign='right';g.textBaseline='bottom';g.fillText('● = excludes 0',w-4,m.t-10)}
+  updateReadouts(false);
+}
+
+function updateReadouts(final){
+  document.getElementById('bVal').textContent=fmt(trueB,3)+(trueB===0?' (H₀ true)':'');
+  document.getElementById('nVal').textContent=N;
+  const vis=rows.slice(0,shown), cov=vis.filter(r=>r.cover).length, ex=vis.filter(r=>r.excl).length;
+  document.getElementById('cover').textContent=shown?cov+' / '+shown:'– / 100';
+  if(totals.drawn>0){
+    document.getElementById('total').textContent=totals.covered.toLocaleString()+' / '+totals.drawn.toLocaleString();
+    document.getElementById('totalPct').textContent='= '+fmt(100*totals.covered/totals.drawn,1)+'% coverage (target: '+lvl+'%)';
+  }else{document.getElementById('total').textContent='–';document.getElementById('totalPct').textContent=''}
+  const test=document.getElementById('chkTest').checked;
+  document.getElementById('testBox').style.display=test?'block':'none';
+  document.getElementById('excl').textContent=shown?ex+' / '+shown:'–';
+  document.getElementById('exclNote').innerHTML=trueB===0?
+    'H₀ is true here, so these are false positives: about '+(100-lvl)+'%.':
+    'An interval excludes 0 exactly when |t| &gt; critical value: the '+lvl+'% CI and the '+(100-lvl)+'% test always agree. Here this share is the test\'s <strong>power</strong>.';
+  if(final){
+    const missed=rows.length-cov;
+    document.getElementById('msg').innerHTML=missed===0?'All 100 caught the truth this time. Run it again; that won\'t last!':
+      '<strong>'+missed+' interval'+(missed>1?'s':'')+' missed</strong> the true β. The researchers made no mistake; they were just unlucky with their samples. Try 80%: shorter intervals, more misses. Try 99%: wider intervals, fewer misses. Try a larger N: every interval gets shorter, but the miss rate stays the same.';
+  }
+}
+
+document.getElementById('bRun').addEventListener('click',()=>{if(!animating)newRun()});
+document.getElementById('seg').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b||animating)return;
+  document.querySelectorAll('#seg button').forEach(x=>x.classList.toggle('on',x===b));
+  lvl=+b.dataset.l;totals={drawn:0,covered:0,excl:0};newRun();
+});
+const nEl=document.getElementById('n'), bEl=document.getElementById('beta');
+nEl.addEventListener('input',()=>{document.getElementById('nVal').textContent=nEl.value});
+nEl.addEventListener('change',()=>{N=+nEl.value;totals={drawn:0,covered:0,excl:0};if(!animating)newRun()});
+bEl.addEventListener('input',()=>{document.getElementById('bVal').textContent=fmt(+bEl.value,3)});
+bEl.addEventListener('change',()=>{trueB=+bEl.value;totals={drawn:0,covered:0,excl:0};if(!animating)newRun()});
+document.getElementById('chkTest').addEventListener('change',draw);
+window.addEventListener('resize',draw);
+
+const q=new URLSearchParams(location.search);
+if(q.has('test'))document.getElementById('chkTest').checked=true;
+document.getElementById('msg').innerHTML='Watch the intervals drop in. <span style="color:#15803d;font-weight:600">Green</span> = contains the true β. <span style="color:#dc2626;font-weight:600">Red</span> = misses it.';
+if(q.has('static')){rows=[];const c=crit();for(let i=0;i<100;i++)rows.push(oneStudy(c));
+  let lo=Math.min(0,ours().lo),hi=Math.max(0.08,ours().hi);for(const r of rows){lo=Math.min(lo,r.lo);hi=Math.max(hi,r.hi)}
+  const pad=(hi-lo)*0.05;range=[lo-pad,hi+pad];shown=100;totals={drawn:100,covered:rows.filter(r=>r.cover).length,excl:0};draw();updateReadouts(true)}
+else newRun();
+</script>
+</body>
+</html>
