@@ -1,0 +1,1039 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Econometrics Recap</title>
+<!-- Interactive version of slides/recap/recap.tex. The simulations in this folder are shown inside the slides (with ?embed). -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" onload="renderMath()"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--ink:#1c2330;--muted:#5b6472;--bg:#f6f6f3;--paper:#fff;--line:#e7e8ea;
+        --red:#c81e1e;--blue:#1d4ed8;--accent:#2563eb;--green:#15803d}
+  html,body{height:100%;overflow:hidden}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink)}
+
+  /* ---------- slides ---------- */
+  .slide{position:fixed;inset:0;display:none;align-items:center;justify-content:center}
+  .slide.on{display:flex}
+  .stage{width:1280px;height:720px;flex:none;background:var(--paper);position:relative;
+         display:flex;flex-direction:column;padding:40px 76px 56px;transform-origin:center center;
+         box-shadow:0 2px 24px rgba(16,24,40,.08)}
+  .kick{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:4px}
+  .stage h2{font-size:35px;font-weight:700;letter-spacing:-.01em;margin-bottom:26px;line-height:1.2}
+  /* text slides: autofit() below scales a .body up (or down) to fill the slide; nested sizes are relative */
+  .body{font-size:24px;line-height:1.45;flex:none}
+  .body.sm{font-size:21px}
+  .body p{margin-bottom:.66em}
+  .body .sm{font-size:.88em}
+  .body .xs{font-size:.8em}
+  .muted{color:var(--muted)}
+  .red{color:var(--red);font-weight:700}
+  .blue{color:var(--blue);font-weight:700}
+  b,strong{font-weight:700}
+
+  /* beamer-style circle bullets */
+  .stage ul{list-style:none}
+  .stage ul>li{position:relative;padding-left:30px;margin-bottom:12px}
+  .stage ul>li::before{content:'';position:absolute;left:5px;top:.6em;width:9px;height:9px;border-radius:50%;background:var(--ink)}
+  .stage ul ul,.stage ol ul{margin-top:8px;font-size:.9em}
+  .stage ul ul>li{margin-bottom:6px}
+  .stage ul ul>li::before{width:7px;height:7px;background:#8a909c}
+  .stage ul.loose>li{margin-bottom:20px}
+  .stage ol{padding-left:36px}
+  .stage ol>li{margin-bottom:12px;padding-left:6px}
+  .stage ol>li::marker{font-weight:700}
+  .quote{border-left:4px solid var(--accent);background:#f5f8ff;padding:14px 22px;border-radius:0 10px 10px 0;font-style:italic;margin:6px 0 10px}
+  .eq{margin:14px 0}
+  .katex{font-size:1.05em}
+  .katex-display{margin:.5em 0}
+
+  /* figures */
+  .fig{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+  .fig img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+  .stack{display:grid;min-height:0}
+  .stack>*{grid-area:1/1}
+  .full{padding:0}
+  .full .fig{height:100%}
+  .cols{display:grid;gap:36px;flex:1;min-height:0;align-items:center}
+  .caption{font-size:22px;margin-bottom:10px}
+
+  /* step reveals (beamer \pause / overlays) */
+  .hid{visibility:hidden}
+  .gone{display:none!important}
+  [data-on]{transition:opacity .25s}
+  .hid[data-on]{opacity:0}
+
+  /* section and title slides */
+  .center{justify-content:center;align-items:center;text-align:center}
+  .center h1{font-size:64px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+  .center .partno{font-size:15px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:14px}
+  .center .under{font-size:22px;color:var(--muted);margin-top:18px}
+  .title h1{font-size:76px}
+  .keys{margin-top:54px;font-size:16px;color:#8a909c;line-height:2}
+  kbd{background:#fff;border:1px solid #d4d6da;border-bottom-width:2.5px;border-radius:6px;padding:1px 8px;font-family:inherit;font-size:90%;color:var(--ink)}
+
+  /* link to a live demo slide (replaces \livedemo) */
+  .demo{position:absolute;left:76px;bottom:22px;font-size:16px;color:var(--blue);background:#eff4ff;border:1px solid #c9d8fb;
+        border-radius:999px;padding:5px 14px;text-decoration:none;cursor:pointer;font-weight:600}
+  .demo:hover{background:#e0eaff}
+  .demo .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-right:8px;vertical-align:1px;animation:blink 1.6s infinite}
+  @keyframes blink{50%{opacity:.25}}
+
+  /* interactive figures */
+  svg text{font-family:'Segoe UI',system-ui,sans-serif}
+  .mathfont{font-family:'Cambria Math',Cambria,Georgia,serif}
+  .drag{cursor:ew-resize}
+  .hint{font-size:16px;color:var(--muted);text-align:center;margin-top:6px}
+  .hint a{color:var(--blue);cursor:pointer;text-decoration:underline}
+  .readout{font-size:20px;background:#f6f8ff;border:1px solid #dbe4ff;border-radius:10px;padding:10px 16px;margin-top:12px}
+  .yes{color:var(--red);font-weight:700}
+  .no{color:var(--green);font-weight:700}
+
+  /* ---------- live simulation slides ---------- */
+  .slide.sim{flex-direction:column;align-items:stretch;justify-content:flex-start;background:var(--bg)}
+  .simbar{flex:none;display:flex;align-items:center;gap:16px;padding:8px 14px 8px 18px;background:var(--ink);color:#fff;min-height:58px}
+  .simbar .badge{flex:none;font-size:11.5px;font-weight:700;letter-spacing:.12em;background:var(--red);border-radius:6px;padding:4px 8px}
+  .simbar .txt{flex:1;min-width:0}
+  .simbar .t{font-weight:700;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .simbar .try{font-size:13.5px;color:#b7c0d0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .simbar .try b{color:#fff;font-weight:600}
+  .simbar a,.simbar button{flex:none;color:#dbe4ff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:8px;
+        font:inherit;font-size:13px;padding:6px 10px;cursor:pointer;text-decoration:none}
+  .simbar a:hover,.simbar button:hover{background:rgba(255,255,255,.18)}
+  .simbar .nav{display:flex;align-items:center;gap:6px;font-size:13px;color:#b7c0d0;font-variant-numeric:tabular-nums}
+  .simbar .nav button{width:34px;height:34px;padding:0;border-radius:50%;background:var(--accent);border:0;color:#fff;font-size:17px;font-weight:700}
+  .slide.sim iframe{flex:1;width:100%;border:0;background:var(--bg)}
+  .bh{font-family:'Cambria Math',Cambria,Georgia,serif}
+
+  /* student version (slides_student.html): live-demo slides become link cards */
+  .linkcard .badge{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.12em;color:#fff;background:var(--red);border-radius:6px;padding:4px 10px;margin-bottom:18px}
+  .linkcard h1{font-size:46px!important;max-width:1000px}
+  .linkcard .tryline{font-size:21px;color:var(--muted);max-width:940px;margin-top:20px;line-height:1.5}
+  .linkcard .tryline b{color:var(--ink)}
+  .linkcard .open{display:inline-block;margin-top:34px;font-size:24px;font-weight:700;color:#fff;text-decoration:none;
+        background:linear-gradient(135deg,#3b82f6,#1d4fd7);border-radius:14px;padding:16px 34px;box-shadow:0 6px 18px rgba(37,99,235,.28)}
+  .linkcard .open:hover{filter:brightness(1.08)}
+  .linkcard .url{font-size:16px;color:#8a909c;margin-top:14px}
+  .linkcard .all{font-size:17px;margin-top:26px}
+  .linkcard .all a{color:var(--blue)}
+  html[data-version="student"] .teacher-only{display:none}
+
+  /* ---------- HUD, progress, overview ---------- */
+  #hud{position:fixed;right:16px;bottom:12px;z-index:50;display:flex;align-items:center;gap:8px;
+       background:rgba(28,35,48,.82);border-radius:999px;padding:5px 8px;color:#fff;opacity:.35;transition:opacity .2s}
+  #hud:hover{opacity:1}
+  #hud button{width:32px;height:32px;border-radius:50%;border:0;background:var(--accent);color:#fff;font-size:16px;font-weight:700;cursor:pointer}
+  #hud #counter{font-size:13.5px;font-variant-numeric:tabular-nums;min-width:56px;text-align:center;cursor:pointer}
+  body.onsim #hud{display:none}
+  #bar{position:fixed;left:0;bottom:0;height:3px;background:var(--accent);z-index:51;transition:width .25s}
+  #ov{position:fixed;inset:0;z-index:100;background:rgba(246,246,243,.97);display:none;overflow:auto;padding:36px 5vw 60px}
+  #ov.open{display:block}
+  #ov h3{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:22px 0 8px}
+  #ov .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px}
+  #ov a{display:flex;gap:10px;align-items:baseline;background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px;
+        text-decoration:none;color:var(--ink);font-size:14.5px;cursor:pointer}
+  #ov a:hover{border-color:var(--accent)}
+  #ov a.cur{border-color:var(--accent);box-shadow:0 0 0 2px #c9d8fb}
+  #ov a .n{color:#8a909c;font-variant-numeric:tabular-nums;min-width:22px}
+  #ov a.live{background:#fff7f7;border-color:#f3c6c6}
+  #ov a.live .n::after{content:' ▶';color:var(--red)}
+  #ov .top{display:flex;justify-content:space-between;align-items:center}
+  #ov .top b{font-size:22px}
+  #ov .top span{font-size:14px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<!-- =====================================================================
+     PART 1 · STATISTICS REVIEW
+     ===================================================================== -->
+
+<section class="slide" data-title="Title"><div class="stage center title">
+  <div class="partno">Econometrics</div>
+  <h1>Econometrics Recap</h1>
+  <div class="under">Statistics, OLS and statistical inference, with live simulations</div>
+  <div class="keys"><kbd>→</kbd> / <kbd>←</kbd> next / back &nbsp;·&nbsp; <kbd>O</kbd> overview &nbsp;·&nbsp; <kbd>F</kbd> fullscreen<br>
+  <span class="teacher-only">On a live-demo slide, use the simulation with the mouse; the arrow keys still change slides.</span></div>
+</div></section>
+
+<section class="slide" data-section="Statistics review"><div class="stage">
+  <h2>Outline</h2>
+  <div class="body">
+    <ol>
+      <li>Review basic statistics and econometrics
+        <ul><li>Mean, Standard deviation</li><li>Expected Value</li><li>OLS</li></ul>
+      </li>
+      <li style="margin-top:26px">Statistical inference
+        <ul><li>Central Limit theorem</li><li>Hypothesis testing</li></ul>
+      </li>
+    </ol>
+  </div>
+</div></section>
+
+<section class="slide" data-section="Statistics review"><div class="stage">
+  <h2>The Aim</h2>
+  <div class="body">
+    <p>The common objective in empirical sciences is to learn something about a <span class="red">population</span></p>
+    <p style="margin-top:10px">For example</p>
+    <ul>
+      <li>What is the average annual salary <span class="red">among all working-age individuals in the UK</span></li>
+      <li>What is the average height <span class="red">among all students at the University of Glasgow</span></li>
+      <li>What is the average relationship between education and wages <span class="red">among all working-age individuals in the USA</span></li>
+    </ul>
+    <p style="margin-top:14px"><span class="red">Challenge:</span> We rarely observe the full population.</p>
+    <p>However, we can use <span class="blue">samples</span> and tools of Econometrics and Statistics to learn something about the <span class="red">population</span></p>
+  </div>
+</div></section>
+
+<section class="slide" data-section="Statistics review"><div class="stage">
+  <h2>Data</h2>
+  <div class="body">
+    <p><b>Source: Current Population Survey (CPS)</b></p>
+    <ul class="loose">
+      <li>Sample of 30,967 men living in the USA and born 1944–53</li>
+      <li>Years 1979 and 1981–85</li>
+      <li>Information about
+        <ul><li>Annual wage</li><li>Years of Education</li><li>Employment status</li><li>Age</li></ul>
+      </li>
+      <li>The data are a repeated cross-section: a snapshot of potentially different individuals living in the USA at different points in time</li>
+    </ul>
+  </div>
+</div></section>
+
+<section class="slide" data-section="Statistics review"><div class="stage">
+  <h2>Wage Distribution in the Data</h2>
+  <div class="fig"><img src="figures/wage_dist.png" alt="Histogram of nominal annual wages in the CPS"></div>
+</div></section>
+
+<section class="slide" data-section="Statistics review"><div class="stage">
+  <h2>Sample Mean</h2>
+  <div class="fig"><img src="figures/wage_mean.png" alt="Wage histogram with the sample mean"></div>
+</div></section>
+
+<section class="slide" data-section="Statistics review"><div class="stage">
+  <h2>Sample Median</h2>
+  <div class="fig"><img src="figures/wage_median.png" alt="Wage histogram with the sample median"></div>
+</div></section>
+
+<section class="slide" data-section="Statistics review"><div class="stage">
+  <h2>Sample Standard Deviation</h2>
+  <div class="fig"><img src="figures/wage_sd.png" alt="Wage histogram with the sample standard deviation"></div>
+</div></section>
+
+<section class="slide" data-section="Statistics review"><div class="stage">
+  <h2>Back to our Aim: Mathematical Expectation</h2>
+  <div class="body">
+    <p>Remember: we want to learn something about a <span class="red">population</span></p>
+    <div data-on="2-" style="margin-top:22px">
+      <p>One target: <b><span class="blue">Mathematical Expectation (expected value)</span> of outcome $Y_{i}$, $\EX[Y_{i}]$</b></p>
+      <ul><li>Equivalent to the population mean or sample average in an infinite population</li></ul>
+    </div>
+    <div data-on="3-" style="margin-top:22px">
+      <p><b>Examples:</b></p>
+      <ul>
+        <li>Average annual salary <span class="red">among all individuals in the UK</span></li>
+        <li>Average height <span class="red">among all students at the University of Glasgow</span></li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<section class="slide" data-section="Statistics review"><div class="stage">
+  <h2>Back to our Aim: Conditional Mathematical Expectation</h2>
+  <div class="body">
+    <p>Another target: <b><span class="blue">Conditional Mathematical Expectation</span> $\EX[Y_{i}\mid X_{i} = x]$</b></p>
+    <ul><li>The conditional expectation of $Y_{i}$ given $X_{i}=x$ is the average of $Y_{i}$ in an infinite population when $X_{i}=x$</li></ul>
+    <div data-on="2-" style="margin-top:26px">
+      <p><b>Example:</b> Let $Y_{i}$ be a salary, and let $X_{i} \in \{0,1\}$ be a “Finnish football player indicator”</p>
+      <ul>
+        <li>$\EX[Y_{i}\mid X_{i} = 1]$ is average salary among infinitely many Finnish football players</li>
+        <li>$\EX[Y_{i}\mid X_{i} = 0]$ is average salary among everybody else</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<section class="slide" data-section="Statistics review"><div class="stage">
+  <h2>Law of Large Numbers (LLN)</h2>
+  <div class="body">
+    <p><b>The Challenge:</b> we want to learn something about a <span class="red">population</span> but only observe a <span class="blue">sample</span>.</p>
+    <p style="margin-top:22px"><b>Solution: The Law of Large Numbers (LLN)</b></p>
+    <div class="quote">Sample moments converge in probability to the corresponding population moments. In other words, the probability that the sample mean is close to the population mean can be made as high as you like by taking a large enough sample.</div>
+  </div>
+  <a class="demo" data-goto="sim-lln"><span class="dot"></span>Live demo: watch $\bar{Y}$ settle on $\EX[Y_i]$</a>
+</div></section>
+
+<section class="slide" data-section="Statistics review"><div class="stage">
+  <h2>Law of Large Numbers (LLN)</h2>
+  <div class="body">
+    <p><b>Basic idea:</b> Suppose you have a randomly drawn sample from a population</p>
+    <ul class="loose">
+      <li>In small samples, the realized average of $Y_{i}$ might be far from $\EX[Y_{i}]$</li>
+      <li><b>LLN</b> says: Average of $Y_{i}$ ($\bar{Y}$) gets very close to $\EX[Y_{i}]$ as the number of observations ($n$) gets large
+        \[ \bar{Y} \rightarrow \EX[Y_{i}] \quad \text{when} \quad n \rightarrow \infty \]
+      </li>
+    </ul>
+    <p class="sm">The sample average $\bar{Y}$ is an unbiased estimate of $\EX[Y_{i}]$ in any sample size, and by the LLN it is also consistent: as $n$ grows, $\bar{Y}$ gets arbitrarily close to $\EX[Y_{i}]$ $\rightarrow$ when $n$ is large enough, we can use $\bar{Y}$ to approximate $\EX[Y_{i}]$</p>
+  </div>
+</div></section>
+
+<section class="slide" data-section="Statistics review"><div class="stage">
+  <h2>LLN in action</h2>
+  <div class="fig"><img src="figures/lln_1.png" alt="LLN illustration 1"></div>
+</div></section>
+
+<section class="slide" data-section="Statistics review"><div class="stage">
+  <h2>LLN in action</h2>
+  <div class="fig"><img src="figures/lln_2.png" alt="LLN illustration 2"></div>
+</div></section>
+
+<section class="slide" data-section="Statistics review"><div class="stage">
+  <h2>LLN in action</h2>
+  <div class="fig"><img src="figures/llw_emoji.png" alt="Sample means with n = 10 and n = 50"></div>
+</div></section>
+
+<section class="slide sim" id="sim-lln" data-section="Statistics review" data-title="Live demo: the law of large numbers">
+  <div class="simbar"><span class="badge">LIVE DEMO</span>
+    <div class="txt"><div class="t">The law of large numbers: watch Ȳ settle on E[Y]</div>
+      <div class="try"><b>Try:</b> Draw 1 person a few times → +10, +100 → Run to n = 10,000 → switch to 5 researchers → tick the LLN funnel</div></div>
+  </div>
+  <iframe data-src="1_law_of_large_numbers.html" title="Simulation: the law of large numbers"></iframe>
+</section>
+
+<!-- =====================================================================
+     PART 2 · ORDINARY LEAST SQUARES
+     ===================================================================== -->
+
+<section class="slide" data-section="Ordinary least squares" data-title="Ordinary Least Squares"><div class="stage center">
+  <div class="partno">Part 2</div>
+  <h1>Ordinary Least Squares</h1>
+</div></section>
+
+<section class="slide" data-section="Ordinary least squares"><div class="stage">
+  <h2>Bivariate Analysis</h2>
+  <div class="body">
+    <ul>
+      <li>So far, we have been mainly thinking about how to summarize information in one variable</li>
+      <li>What if we are interested in how two variables are related?</li>
+      <li>For example, what is the relationship between education and earnings?</li>
+      <li data-on="2-">We could use conditional expectations:</li>
+      <li data-on="2-">Suppose $Y_{i}$ is a salary, and let $X_{i} \in \{0,1\}$ be an indicator for having a university degree</li>
+      <li data-on="2-">Average difference in salary between high- and low-educated individuals would be
+        \[ \EX[Y_{i}\mid X_{i} = 1] - \EX[Y_{i}\mid X_{i} = 0] \]</li>
+      <li data-on="2-">But what if $X_{i}$ is a continuous variable?</li>
+    </ul>
+  </div>
+</div></section>
+
+<section class="slide" data-section="Ordinary least squares"><div class="stage">
+  <h2>What is a linear regression?</h2>
+  <div class="body">
+    <ul class="loose">
+      <li>A tool to describe the relationship between two variables in the data, e.g. earnings $Y_i$ and years of education $X_i$</li>
+      <li>In the simplest case, a straight line: the line that best describes <b>how the average of $Y_i$ changes with $X_i$</b> (the conditional expectation). <b>Ordinary least squares (OLS)</b> is the algorithm that finds it</li>
+      <li>We can use the line to make predictions. <span class="red">Sometimes these predictions are causal, and sometimes not</span>. This course is about telling the two apart</li>
+    </ul>
+  </div>
+</div></section>
+
+<section class="slide" data-section="Ordinary least squares"><div class="stage">
+  <h2>Years of Education and Earnings in CPS Data</h2>
+  <div class="cols" style="grid-template-columns:1.9fr 1fr">
+    <div class="fig" style="height:100%"><img src="figures/wages_ed_scatter.png" alt="Scatter of earnings against years of education"></div>
+    <div class="body sm">
+      <ul class="loose">
+        <li>Earnings vary a lot at every level of education
+          <ul><li>Other factors matter</li><li>Randomness</li></ul></li>
+        <li>Still, a clear positive relationship</li>
+        <li>How can we summarize it?</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<section class="slide" data-section="Ordinary least squares"><div class="stage">
+  <h2>A simple way to summarize the relationship between the two variables is to fit a line</h2>
+  <div class="body">
+    <p>We can write the functional form of this line as</p>
+    \[ \text{earnings} = \alpha + \beta \times \text{education} \]
+    <ul class="loose" style="margin-top:14px">
+      <li>This is just the functional form of a straight line with two <b>parameters:</b>
+        <ol style="margin-top:14px;font-size:.95em">
+          <li>The intercept $(\alpha)$ tells us where the line crosses the y-axis</li>
+          <li>The slope $(\beta)$ of the line tells us how much the earnings change if we increase the years of education by one</li>
+        </ol>
+      </li>
+    </ul>
+  </div>
+</div></section>
+
+<section class="slide" data-section="Ordinary least squares" data-title="Years of Education and Earnings in CPS: candidate lines"><div class="stage">
+  <h2>Years of Education and Earnings in CPS</h2>
+  <div class="stack caption">
+    <div data-on="1">One possible line</div>
+    <div data-on="2">Maybe this black line fits the data better?</div>
+    <div data-on="3">Or the orange? I do not know.</div>
+  </div>
+  <div class="fig stack" style="justify-items:center;align-items:center">
+    <img data-on="1" src="figures/candidate_lines1.png" alt="Candidate line 1" style="max-height:540px">
+    <img data-on="2" src="figures/candidate_lines2.png" alt="Candidate line 2" style="max-height:540px">
+    <img data-on="3" src="figures/candidate_lines3.png" alt="Candidate line 3" style="max-height:540px">
+  </div>
+</div></section>
+
+<section class="slide" data-section="Ordinary least squares"><div class="stage">
+  <h2>The Line</h2>
+  <div class="body">
+    <ul class="loose">
+      <li>We want to find a line to be “as close as possible” to all the points in the data</li>
+      <li>How do we find this line? We use OLS. It finds <b>parameters</b> that make the fitted line “as close as possible” to the data</li>
+      <li>Specifically: OLS minimizes the sum of the squared deviations of the data from the regression line</li>
+      <li>Various statistical software packages will do this for you</li>
+    </ul>
+  </div>
+  <a class="demo" data-goto="sim-line"><span class="dot"></span>Live demo: can you beat OLS by hand?</a>
+</div></section>
+
+<section class="slide" data-section="Ordinary least squares"><div class="stage">
+  <h2>OLS</h2>
+  <div class="body">
+    <p>We can summarize the linear relationship between earnings and years of education with the simple linear OLS regression model:</p>
+    \[ \text{earnings}_i = \alpha + \beta \times \text{education}_i + e_i \]
+    <ul class="loose">
+      <li>$\alpha$ and $\beta$ are the <span style="color:var(--blue)">regression coefficients</span> that OLS finds; the subscript $i$ denotes individuals</li>
+      <li>$e_i$ is the <b>error term</b>: all the other factors influencing earnings besides years of education</li>
+      <li>Once OLS has fitted the line, the <b>residual</b> $\hat{e}_i$ is how far each individual's actual earnings are from the fitted line. It is our estimate of the unobserved error term $e_i$</li>
+    </ul>
+  </div>
+</div></section>
+
+<section class="slide" data-section="Ordinary least squares" data-title="The fitted line in the CPS data (5 steps)"><div class="stage full">
+  <div class="fig stack" style="justify-items:center;align-items:center">
+    <img data-on="1" src="figures/ols_steps1.png" alt="Each observation has earnings and years of education">
+    <img data-on="2" src="figures/ols_steps2.png" alt="The intercept and the slope of the OLS line">
+    <img data-on="3" src="figures/ols_steps3.png" alt="The OLS prediction for 10 years of education">
+    <img data-on="4" src="figures/ols_steps4.png" alt="Residuals of a sample of observations">
+    <img data-on="5" src="figures/ols_steps5.png" alt="The residual of one man">
+  </div>
+</div></section>
+
+<!-- REMOVED: "How does the OLS find the Line?" (6 steps). The "Find the best line" simulation that follows now walks through
+     the same steps (data, a line, residuals, squared residuals). Delete the comment markers to bring the slide back.
+<section class="slide" data-section="Ordinary least squares" data-title="How does the OLS find the Line? (6 steps)"><div class="stage">
+  <h2>How does the OLS find the Line?</h2>
+  <div class="cols" style="grid-template-columns:1.9fr 1fr;align-items:start">
+    <div class="stack">
+      <img data-on="1" src="figures/ols1.png" alt="Data" style="width:100%">
+      <img data-on="2" src="figures/ols2.png" alt="A line through the data" style="width:100%">
+      <img data-on="3" src="figures/ols3.png" alt="Residuals" style="width:100%">
+      <img data-on="4" src="figures/ols4.png" alt="Squared residuals" style="width:100%">
+      <img data-on="5" src="figures/ols6.png" alt="Another line" style="width:100%">
+      <img data-on="6" src="figures/ols_final.png" alt="The OLS line" style="width:100%">
+    </div>
+    <div class="stack body sm" style="padding-top:20px">
+      <ul class="loose" data-on="1"><li>Assume we have data on the left</li><li>We want to find a line that is the best description of the relationship between Y and X</li></ul>
+      <ul class="loose" data-on="2"><li>Let's just draw a line through the data</li><li>This is not necessarily the OLS</li></ul>
+      <ul class="loose" data-on="3"><li>Is this line a good summary of the relationship between X and Y?</li><li>Let's use the residuals to evaluate whether our line is a good description of the data</li><li>Remember, residuals measure how far away our predictions are from the actual data points</li></ul>
+      <ul class="loose" data-on="4"><li>Next, let's square those residuals</li><li>We want to find a line that gives us the smallest sum of squared residuals!</li><li>Is this the line? I do not know.</li></ul>
+      <ul class="loose" data-on="5"><li>Maybe this line is better?</li><li>Hard to say!</li></ul>
+      <ul class="loose" data-on="6"><li>This is the OLS regression line</li><li>It is a mathematical fact that it gives you the smallest sum of squared residuals!</li></ul>
+    </div>
+  </div>
+</div></section>
+-->
+
+<section class="slide sim" id="sim-line" data-section="Ordinary least squares" data-title="Live demo: find the best line">
+  <div class="simbar"><span class="badge">LIVE DEMO</span>
+    <div class="txt"><div class="t">Find the best line: can you beat OLS by hand?</div>
+      <div class="try"><b>Try:</b> Next step through 1–4: draw the data → fit a line → show the residuals → square them. Then drag the line to shrink the squares → Reveal the OLS line</div></div>
+  </div>
+  <iframe data-src="2_find_the_best_line.html" title="Simulation: find the best line"></iframe>
+</section>
+
+<section class="slide" data-section="Ordinary least squares"><div class="stage">
+  <h2>What does the statistical software actually do?</h2>
+  <div class="body">
+    <ul><li>When we run regressions, the statistical software solves the following problem</li></ul>
+    \[ \argmin_{\alpha,\beta}\; \EX\big[(Y_{i} - \alpha - \beta X_{i})^2\big] \]
+    <p>The solution to this minimization problem happens to be</p>
+    <ul>
+      <li>$\hat{\beta} = \dfrac{COV(Y_{i},X_{i})}{VAR(X_{i})}$</li>
+      <li>$\hat{\alpha} = \EX[Y_i] - \beta\, \EX[X_i]$</li>
+      <li>$\hat{\beta}$ and $\hat{\alpha}$ are called OLS estimators: they are simple algorithms applied to data</li>
+    </ul>
+  </div>
+</div></section>
+
+<section class="slide" data-section="Ordinary least squares"><div class="stage">
+  <h2>Three reasons to love OLS</h2>
+  <div class="body">
+    <p><b>Conditional expectation function (CEF):</b> $\EX[Y_i \mid X_i = x]$, the <b>average of $Y_i$ at each value of $X_i$</b></p>
+    <ol style="margin:22px 0">
+      <li>OLS gives the <b>best linear predictor</b> of $Y_i$ given $X_i$</li>
+      <li>If the CEF is linear, the regression line <b>is</b> the CEF</li>
+      <li>If the CEF is not linear, regression gives the <b>best linear approximation</b> to the CEF</li>
+    </ol>
+    <p><span class="red">Take-away:</span> regression is always a good summary of how the average of $Y_i$ changes with $X_i$. Whether that relationship is <b>causal</b> is a separate question, and that question is what this course is about.</p>
+  </div>
+</div></section>
+
+<section class="slide sim" id="sim-cef" data-section="Ordinary least squares" data-title="Live demo: regression and the CEF">
+  <div class="simbar"><span class="badge">LIVE DEMO</span>
+    <div class="txt"><div class="t">Regression and the conditional expectation function</div>
+      <div class="try"><b>Try:</b> work through steps 1–5: the mean → the CEF at one x → straight vs curved truth (and N = 20,000) → the saturated 0/1 model</div></div>
+  </div>
+  <iframe data-src="2b_regression_and_cef.html" title="Simulation: regression and the CEF"></iframe>
+</section>
+
+<!-- =====================================================================
+     PART 3 · STATISTICAL INFERENCE
+     ===================================================================== -->
+
+<section class="slide" data-section="Statistical inference" data-title="Statistical Inference"><div class="stage center">
+  <div class="partno">Part 3</div>
+  <h1>Statistical Inference</h1>
+</div></section>
+
+<section class="slide" data-section="Statistical inference"><div class="stage">
+  <h2>Sampling variation</h2>
+  <div class="body">
+    <ul class="loose">
+      <li>Remember, we want to learn something about the <span class="red">population</span> but we only observe <span class="blue">a sample</span></li>
+      <li>Suppose we drew multiple random samples. With every draw, we would get a slightly different sample and estimates.</li>
+      <li>The estimates vary from sample to sample because of <b>sampling variation</b></li>
+      <li>In other words, because the data are a random sample, our estimators are random variables</li>
+      <li>Sometimes, our estimate may be very extreme because we draw a very extreme sample</li>
+    </ul>
+  </div>
+</div></section>
+
+<section class="slide sim" id="sim-slope" data-section="Statistical inference" data-title="Live demo: sampling variation">
+  <div class="simbar"><span class="badge">LIVE DEMO</span>
+    <div class="txt"><div class="t">Sampling variation: one sample, one slope</div>
+      <div class="try"><b>Try:</b> Draw a new sample and run OLS, several times → change N to 30, then 1,000 → how much do the lines move?</div></div>
+  </div>
+  <iframe data-src="3b_slope_sampling_and_clt.html" title="Simulation: one sample, one slope"></iframe>
+</section>
+
+<section class="slide" data-section="Statistical inference"><div class="stage">
+  <h2>The Central Limit Theorem Rescues Us</h2>
+  <div class="body">
+    <ul>
+      <li>Fortunately, we can use statistics to infer whether our estimate carries a signal or is just noise</li>
+      <li>The most important building block is the <b>Central Limit Theorem</b> (CLT):</li>
+    </ul>
+    <div class="quote sm">THE CENTRAL LIMIT THEOREM Sample moments are asymptotically Normally distributed (after subtracting the corresponding population moment and multiplying by the square root of the sample size). In other words, in large enough samples, <b>appropriately normalized sample moments are approximately Normally distributed.</b></div>
+    <ul><li>CLT says that the distribution of sample means approximates a normal distribution as the sample size gets larger, regardless of the population's distribution.</li></ul>
+  </div>
+</div></section>
+
+<section class="slide sim" id="sim-clt" data-section="Statistical inference" data-title="Live demo: the central limit theorem">
+  <div class="simbar"><span class="badge">LIVE DEMO</span>
+    <div class="txt"><div class="t">The central limit theorem</div>
+      <div class="try"><b>Try:</b> n = 30: Draw 1 sample a few times, then 1,000 → try n = 1, 5, 30, 500 → tick the normal curve and zoom in → other populations</div></div>
+  </div>
+  <iframe data-src="3_sampling_and_clt.html" title="Simulation: sampling variation and the CLT"></iframe>
+</section>
+
+<section class="slide" data-section="Statistical inference"><div class="stage">
+  <h2>The Beauty of CLT</h2>
+  <div class="body">
+    <p>In a nutshell, the theorem says the following:</p>
+    <ol style="margin-top:26px">
+      <li style="margin-bottom:26px">We can start with any distribution of $Y_i$, possibly non-normal</li>
+      <li>If we take the average of $Y_1,\dots,Y_N$ in a sample sufficiently large, the distribution of the sample average $\bar{Y}$ is (approximately) normal!</li>
+    </ol>
+  </div>
+</div></section>
+
+<section class="slide" data-section="Statistical inference"><div class="stage">
+  <h2>The Beauty of CLT</h2>
+  <div class="fig"><img src="figures/clt.png" alt="The central limit theorem illustrated"></div>
+</div></section>
+
+<section class="slide" data-section="Statistical inference"><div class="stage">
+  <h2>Central Limit theorem is the solution</h2>
+  <div class="body">
+    <ul><li>CLT implies that the OLS estimator has approximately normal distribution as the sample gets large.</li></ul>
+    \[ \hat{\beta} \sim \mathcal{N}(\beta, SE^2) \]
+    <p>That is, the mean of the $\hat{\beta}$ sampling distribution is the true $\beta$, and the standard deviation is equal to the standard error of the OLS estimator</p>
+    <ul>
+      <li>Standard error = SE = $\dfrac{\bar{\sigma}}{\sqrt{N \times var(X)}}$</li>
+      <li class="sm">$\bar{\sigma}$ is the standard deviation of the residuals: the square root of the sum of squared residuals divided by $N - k$, where $k$ is the number of variables in the regression (including the constant). Stata reports it as “Root MSE”</li>
+    </ul>
+  </div>
+</div></section>
+
+<section class="slide sim" id="sim-sd" data-section="Statistical inference" data-title="Live demo: sampling distribution of &lt;span class=&quot;bh&quot;&gt;β&amp;#770;&lt;/span&gt;">
+  <div class="simbar"><span class="badge">LIVE DEMO</span>
+    <div class="txt"><div class="t">The sampling distribution of <span class="bh">β&#770;</span></div>
+      <div class="try"><b>Try:</b> Draw 1,000 → tick Show the CLT curve (SD of the <span class="bh">β&#770;</span>'s vs the SE formula) → move one slider at a time: N, σ, SD of education</div></div>
+  </div>
+  <iframe data-src="4_ols_sampling_distribution.html" title="Simulation: the sampling distribution of beta-hat"></iframe>
+</section>
+
+<section class="slide" data-section="Statistical inference"><div class="stage">
+  <h2>Central Limit theorem is the solution</h2>
+  <div class="body">
+    <p>What do we learn from this?</p>
+    \[ \hat{\beta} \sim \mathcal{N}\left(\beta, \frac{\bar{\sigma}^2}{N \times var(X)}\right) \]
+    <ul class="loose">
+      <li>The larger the standard deviation of the residuals $\bar{\sigma}$, the more noise and the less signal there is in our estimate</li>
+      <li>The more observations $N$ we have, the more precise the estimate</li>
+      <li>The more variation in $X$ ($var(X)$), the more precise the estimate</li>
+    </ul>
+  </div>
+</div></section>
+
+<section class="slide" data-section="Statistical inference"><div class="stage">
+  <h2>Hypothesis Testing</h2>
+  <div class="body">
+    <ul>
+      <li>We can use the property $\hat{\beta} \sim \mathcal{N}(\beta, SE^2)$ to test if our estimate is significant in a statistical sense</li>
+      <li>In hypothesis testing, we make two hypotheses
+        <ol style="margin-top:12px">
+          <li><b>Null hypothesis $H_0$</b>
+            <ul><li>the version of the truth we're testing to see whether we can prove it's wrong</li><li>Often $H_0: \beta = 0$</li></ul></li>
+          <li><b>Alternative hypothesis $H_a$</b>
+            <ul><li>Every version of the truth that's not the null hypothesis</li><li>Often $H_a: \beta \neq 0$</li></ul></li>
+        </ol>
+      </li>
+    </ul>
+  </div>
+</div></section>
+
+<section class="slide" data-section="Statistical inference"><div class="stage">
+  <h2>Hypothesis Testing</h2>
+  <div class="body">
+    <p>Now assume $H_0: \beta = 0$, $H_a: \beta \neq 0$</p>
+    <ul>
+      <li>If the above is our null, we can calculate the following test statistic
+        \[ \textit{t statistic} = \frac{\hat{\beta} - 0}{SE} = \frac{\hat{\beta}}{SE} \sim \mathcal{N}(0, 1) \]</li>
+      <li>The t statistic is a measure of how extreme the observed difference is.</li>
+      <li>After calculating the t statistic, we will ask ourselves, “Is it likely that we would observe such a t statistic if the null hypothesis is true?”</li>
+      <li>We can answer this question using the property that the t statistic follows a standard normal distribution</li>
+    </ul>
+  </div>
+</div></section>
+
+<section class="slide" data-section="Statistical inference"><div class="stage">
+  <h2>Example: Wages and Schooling</h2>
+  <div class="fig" style="padding-bottom:18px"><img src="figures/example_t_test.png" alt="Stata output of reg log_w_wage year_ed with the point estimate, standard error and t statistic highlighted"></div>
+  <a class="demo" data-goto="sim-test"><span class="dot"></span>Live demo: false positives, power, and this result as a p-value</a>
+</div></section>
+
+<!-- the t statistic under H0: the pgfplots figure, revealed in four steps; at step 4 the red line can be dragged -->
+<section class="slide" id="tdist" data-section="Statistical inference" data-title="The distribution of the test statistic if the null is true"><div class="stage">
+  <h2>The Distribution of the test statistic <span class="red">if the null is true</span></h2>
+  <div class="cols" style="grid-template-columns:1.45fr 1fr">
+    <div>
+      <svg id="tsvg" viewBox="0 0 640 450" style="width:100%;display:block;touch-action:none"></svg>
+      <div class="hint" data-on="4">Drag the red line to try another t &nbsp;·&nbsp; <a id="tReset">back to t = 2.71</a></div>
+    </div>
+    <div class="stack body sm">
+      <ul class="loose" data-on="1">
+        <li>In our data we have <b>one sample</b>, so we observe <b>one t statistic</b>: $t = 2.71$</li>
+        <li>Is 2.71 large or small? On its own, we cannot tell</li>
+        <li>We need something to <b>compare it to</b></li>
+      </ul>
+      <ul class="loose" data-on="2">
+        <li><b>Thought experiment:</b> if $H_0$ were true and we could draw many repeated samples, computing $t$ in each, this is how the t statistics would be spread</li>
+        <li>We <span class="red">never observe</span> this distribution, but the <b>CLT</b> tells us its shape: approximately standard normal, centred at 0</li>
+      </ul>
+      <ul class="loose" data-on="3">
+        <li>If $H_0$ is true, $t$ falls between $-1.96$ and $1.96$ <b>95% of the time</b></li>
+        <li>If $|t| > 1.96 \approx 2$, we <span class="red">reject $H_0$</span> at the 5% significance level</li>
+        <li>We then say the estimate is <b>statistically significant</b></li>
+      </ul>
+      <ul class="loose" data-on="4">
+        <li>We can calculate the <b>probability of seeing a $t$ at least as extreme as ours</b> (in either direction), <b>if $H_0$ is true</b>: only <b id="pPct">0.7%</b></li>
+        <li>This is the <span class="red">p-value</span>: <b>p = <span id="pVal">0.007</span></b>, so <span id="pConc">we reject H₀ even at the 1% level</span></li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<section class="slide sim" id="sim-test" data-section="Statistical inference" data-title="Live demo: t-statistics, p-values and power">
+  <div class="simbar"><span class="badge">LIVE DEMO</span>
+    <div class="txt"><div class="t">Hypothesis testing: false positives, power, and our result as a p-value</div>
+      <div class="try"><b>Try:</b> true β = 0: Run 1,000 (≈ 5% false positives) → true β = 0.046: power; then a larger N → Load our Stata result → Researcher's view</div></div>
+  </div>
+  <iframe data-src="5_hypothesis_testing.html" title="Simulation: hypothesis testing"></iframe>
+</section>
+
+<section class="slide" data-section="Statistical inference"><div class="stage">
+  <h2>Confidence intervals</h2>
+  <div class="body">
+    <p>We can also build confidence intervals</p>
+    \[ \hat{\beta} \pm Z \times SE \]
+    <p>Where $Z$ represents our confidence level, and SE stands for standard error</p>
+    <p style="margin-top:14px">In the wages and schooling example, 95 percent confidence intervals are</p>
+    \[ [\,0.046 - 1.96 \times 0.017\,,\; 0.046 + 1.96 \times 0.017\,] = [\,0.012\,,\; 0.079\,] \]
+    <p>A confidence interval shows the range of nulls that our estimate would not reject.</p>
+  </div>
+  <a class="demo" data-goto="sim-ci"><span class="dot"></span>Live demo: 100 studies, 100 intervals, one truth</a>
+</div></section>
+
+<!-- the confidence interval as a picture; at step 3 the null value can be dragged -->
+<section class="slide" id="cipic" data-section="Statistical inference" data-title="Confidence intervals: the picture"><div class="stage">
+  <h2>Confidence intervals: the picture</h2>
+  <svg id="cisvg" viewBox="0 0 1000 250" style="width:100%;display:block;touch-action:none"></svg>
+  <div class="body sm" style="margin-top:10px">
+    <ul class="loose">
+      <li data-on="2-"><b>0 lies outside the interval</b> $\Leftrightarrow$ we <span class="red">reject $H_0: \beta = 0$</span> at the 5% level (as $|t| = 2.71 > 1.96$)</li>
+      <li data-on="3-">Any value <b>inside</b> the interval, e.g. $\beta = 0.03$, would <b>not</b> be rejected: the interval is the set of null values consistent with our data</li>
+    </ul>
+    <div class="readout" data-on="3-" id="ciRead">&nbsp;</div>
+  </div>
+</div></section>
+
+<section class="slide sim" id="sim-ci" data-section="Statistical inference" data-title="Live demo: what 95% confident means">
+  <div class="simbar"><span class="badge">LIVE DEMO</span>
+    <div class="txt"><div class="t">What “95% confident” means: 100 studies, 100 intervals, one truth</div>
+      <div class="try"><b>Try:</b> Run 100 new studies and count the misses → run it again → switch to 80% and 99% → move N → tick Also test H₀: β = 0</div></div>
+  </div>
+  <iframe data-src="6_confidence_intervals.html" title="Simulation: confidence intervals"></iframe>
+</section>
+
+<!-- =====================================================================
+     APPENDIX
+     ===================================================================== -->
+
+<section class="slide" data-section="Appendix" data-title="Appendix"><div class="stage center">
+  <h1>Appendix</h1>
+</div></section>
+
+<section class="slide" data-section="Appendix"><div class="stage">
+  <h2>Appendix: how is the p-value calculated?</h2>
+  <div class="body sm">
+    <p><b>Generic case.</b> Let $T$ be the test statistic, with CDF $F(x) = P(T \leq x)$ <b>if $H_0$ is true</b>. Assume $T$ is continuous, and let $a = |t_{\text{obs}}|$ be the absolute value of our observed t statistic.</p>
+    <ol>
+      <li><b>Split the two tails:</b> \[ p = P(|T| \geq a) = P(T \geq a) + P(T \leq -a) \]</li>
+      <li><b>Write each tail with the CDF:</b> \[ p = \big(1 - F(a)\big) + F(-a) \]</li>
+    </ol>
+    <p>This holds for <b>any</b> continuous distribution.</p>
+    <div data-on="2-">
+      <p><b>Add symmetry.</b> If the distribution is symmetric around 0, then $F(-a) = 1 - F(a)$, so</p>
+      \[ p = 2\big(1 - F(a)\big) \]
+    </div>
+  </div>
+</div></section>
+
+<section class="slide" data-section="Appendix"><div class="stage">
+  <h2>Appendix: how is the p-value calculated?</h2>
+  <div class="body sm">
+    <p><b>Impose normality.</b> If $H_0$ is true, $T \overset{a}{\sim} \mathcal{N}(0,1)$, so $F = \Phi$ (the standard normal CDF):</p>
+    \[ p = 2\big(1 - \Phi(|t_{\text{obs}}|)\big) \]
+    <div data-on="2-">
+      <p><b>Wages and schooling example:</b> $t_{\text{obs}} = 2.71$</p>
+      \[ p = 2\big(1 - \Phi(2.71)\big) = 2\,(1 - 0.9966) = 0.0067 \approx \textcolor{#c81e1e}{\mathbf{0.007}} \]
+    </div>
+    <div data-on="3-">
+      <p><b>Exact t test.</b> The same steps give the exact t-test p-value: set $F = F_{t_{n-k}}$, the CDF of the t distribution with $n - k$ degrees of freedom, which is also symmetric around 0.</p>
+      <ul>
+        <li>This is what Stata reports in the <code>P&gt;|t|</code> column: with $n - k = 163$, $p = 0.0075 \approx 0.007$</li>
+        <li>In large samples the two are almost identical, because $t_{n-k}$ approaches $\mathcal{N}(0,1)$ as $n$ grows</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<section class="slide" data-section="Appendix" data-title="All live demos"><div class="stage">
+  <h2>All live demos in this lecture</h2>
+  <div class="body sm">
+    <p class="muted">Click to jump to the slide. Each simulation also works on its own page: see <a href="index.html" style="color:var(--blue)">all simulations</a>.</p>
+    <ol id="demoList" style="margin-top:14px;columns:2;column-gap:48px"></ol>
+  </div>
+</div></section>
+
+<!-- ============ HUD / overview ============ -->
+<div id="hud">
+  <button id="prev" title="Previous (←)">←</button>
+  <span id="counter" title="Overview (O)">1 / 1</span>
+  <button id="next" title="Next (→)">→</button>
+</div>
+<div id="bar"></div>
+<div id="ov"><div class="top"><b>Econometrics Recap</b><span><kbd>O</kbd> or <kbd>Esc</kbd> to close · ▶ = live demo</span></div><div id="ovBody"></div></div>
+
+<script>
+'use strict';
+// ---------- math (KaTeX; \EX and \argmin as in the beamer preamble) ----------
+function renderMath(){
+  renderMathInElement(document.body,{
+    delimiters:[{left:'\\[',right:'\\]',display:true},{left:'$',right:'$',display:false}],
+    macros:{'\\EX':'\\mathbb{E}','\\argmin':'\\operatorname*{arg\\,min}'},
+    ignoredTags:['script','noscript','style','textarea','pre','code','svg'],
+    throwOnError:false
+  });
+  autofit();
+}
+
+// ---------- text size: fill the slide ----------
+// On text slides (a .body directly inside the stage) the font grows until the text fills the slide, up to MAX px,
+// and shrinks if it would overflow. Hidden steps (data-on) keep their space, so every step fits.
+function autofit(){
+  const MAX=34, MIN=15;
+  document.querySelectorAll('.stage').forEach(st=>{
+    const b=[...st.children].find(e=>e.classList.contains('body'));
+    if(!b)return;
+    const s=st.closest('.slide'), hidden=!s.classList.contains('on');
+    if(hidden){s.style.display='flex';s.style.visibility='hidden'}
+    const avail=720-(st.querySelector('.demo')?72:44);
+    const fits=px=>{b.style.fontSize=px+'px';return b.offsetTop+b.scrollHeight<=avail};
+    let lo=MIN,hi=MAX;
+    if(fits(hi))lo=hi;
+    else while(hi-lo>0.5){const mid=(lo+hi)/2;if(fits(mid))lo=mid;else hi=mid}
+    b.style.fontSize=lo+'px';
+    if(hidden){s.style.display='';s.style.visibility=''}
+  });
+}
+window.addEventListener('load',()=>{autofit();if(document.fonts)document.fonts.ready.then(autofit)});
+
+// ---------- slides and steps ----------
+// data-on="2-" shows an element from step 2 on (space is kept, like beamer's \pause / visible on);
+// "3" = only step 3, "2-4" = steps 2 to 4. A slide has as many steps as its highest number.
+const slides=[...document.querySelectorAll('.slide')];
+const inRange=(spec,k)=>spec.split(',').some(r=>{
+  const m=r.trim().match(/^(\d+)(-)?(\d*)$/);if(!m)return false;
+  const lo=+m[1];return m[2]?(k>=lo&&(m[3]===''||k<=+m[3])):k===lo;
+});
+slides.forEach(s=>{
+  let n=1;
+  s.querySelectorAll('[data-on]').forEach(e=>e.dataset.on.split(/[,-]/).forEach(v=>{if(v)n=Math.max(n,+v)}));
+  s._steps=n;
+});
+function applyStep(s,k){
+  s.querySelectorAll('[data-on]').forEach(e=>e.classList.toggle('hid',!inRange(e.dataset.on,k)));
+  s.dispatchEvent(new CustomEvent('step',{detail:k}));
+}
+
+// student version (<html data-version="student">, built by make_student_slides.py): each live-demo slide
+// becomes a card with a link that opens the simulation on the course website in a new tab
+const SITE='https://marttikaila.com/applied_econometrics/recap/';
+const isLive=s=>s.classList.contains('sim')||s.classList.contains('linkslide');
+if(document.documentElement.dataset.version==='student'){
+  slides.filter(s=>s.classList.contains('sim')).forEach(s=>{
+    const page=s.querySelector('iframe').dataset.src.split('?')[0];
+    const title=s.querySelector('.simbar .t').innerHTML, tryTxt=s.querySelector('.simbar .try').innerHTML;
+    s.classList.remove('sim');s.classList.add('linkslide');
+    s.innerHTML='<div class="stage center linkcard"><div><span class="badge">LIVE DEMO</span></div><h1>'+title+'</h1>'+
+      '<div class="tryline">'+tryTxt+'</div>'+
+      '<a class="open" href="'+SITE+page+'" target="_blank" rel="noopener">▶ Open the simulation</a>'+
+      '<div class="url">'+SITE+page+'</div>'+
+      '<div class="all">or see <a href="'+SITE+'index.html" target="_blank" rel="noopener">all simulations</a></div></div>';
+  });
+}
+
+// sim slides: the iframe loads when the slide (or the one before it) is shown, then stays loaded
+slides.filter(s=>s.classList.contains('sim')).forEach(s=>{
+  const fr=s.querySelector('iframe'), page=fr.dataset.src;
+  fr.dataset.src=page+(page.includes('?')?'&':'?')+'embed';
+  const bar=s.querySelector('.simbar');
+  bar.insertAdjacentHTML('beforeend',
+    '<a href="'+page+'" target="_blank" title="Open the simulation on its own page">open in new tab ↗</a>'+
+    '<button class="rl" title="Start the simulation again">↺ restart</button>'+
+    '<div class="nav"><button class="p" title="Previous slide">←</button><span class="c"></span><button class="n" title="Next slide">→</button></div>');
+  bar.querySelector('.rl').onclick=()=>{fr.src=fr.dataset.src};
+  bar.querySelector('.p').onclick=()=>prev();
+  bar.querySelector('.n').onclick=()=>next();
+});
+function loadFrame(s){const fr=s&&s.querySelector('iframe');if(fr&&!fr.getAttribute('src'))fr.src=fr.dataset.src}
+
+// ---------- navigation ----------
+const counter=document.getElementById('counter'), bar=document.getElementById('bar');
+let cur=-1, step=1;
+function fit(){
+  const sc=Math.min(window.innerWidth/1280,window.innerHeight/720);
+  document.querySelectorAll('.stage').forEach(st=>st.style.transform='scale('+sc+')');
+}
+function show(i,k){
+  i=Math.max(0,Math.min(slides.length-1,i));
+  const s=slides[i];
+  k=Math.max(1,Math.min(s._steps,k||1));
+  if(i!==cur){if(cur>=0)slides[cur].classList.remove('on');cur=i;s.classList.add('on')}
+  step=k;applyStep(s,k);
+  loadFrame(s);loadFrame(slides[i+1]);
+  document.body.classList.toggle('onsim',s.classList.contains('sim'));
+  const lbl=(cur+1)+' / '+slides.length;
+  counter.textContent=lbl;
+  const c=s.querySelector('.simbar .c');if(c)c.textContent=lbl;
+  bar.style.width=((cur+1)/slides.length*100)+'%';
+  const h='#'+(cur+1)+(step>1?'.'+step:'');
+  if(location.hash!==h)history.replaceState(null,'',h);
+  markOverview();
+}
+function next(){if(step<slides[cur]._steps)show(cur,step+1);else if(cur<slides.length-1)show(cur+1,1)}
+function prev(){if(step>1)show(cur,step-1);else if(cur>0)show(cur-1,slides[cur-1]._steps)}
+function gotoId(id){const i=slides.findIndex(s=>s.id===id);if(i>=0)show(i,1)}
+
+function handleKey(key,e){
+  if(ov.classList.contains('open')&&(key==='Escape'||key==='o'||key==='O')){toggleOv();return true}
+  switch(key){
+    case 'ArrowRight':case 'ArrowDown':case 'PageDown':case ' ':case 'Enter':next();return true;
+    case 'ArrowLeft':case 'ArrowUp':case 'PageUp':case 'Backspace':prev();return true;
+    case 'Home':show(0,1);return true;
+    case 'End':show(slides.length-1,1);return true;
+    case 'f':case 'F':
+      if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen().catch(()=>{});
+      return true;
+    case 'o':case 'O':toggleOv();return true;
+  }
+  return false;
+}
+window.addEventListener('keydown',e=>{
+  if(e.ctrlKey||e.metaKey||e.altKey)return;
+  if(handleKey(e.key,e))e.preventDefault();
+});
+// keys pressed inside an embedded simulation arrive as messages
+window.addEventListener('message',e=>{if(e.data&&e.data.deckKey)handleKey(e.data.deckKey)});
+document.getElementById('next').onclick=next;
+document.getElementById('prev').onclick=prev;
+document.querySelectorAll('[data-goto]').forEach(a=>a.addEventListener('click',()=>gotoId(a.dataset.goto)));
+window.addEventListener('resize',fit);
+window.addEventListener('hashchange',()=>{const m=location.hash.match(/^#(\d+)(?:\.(\d+))?/);if(m)show(+m[1]-1,+(m[2]||1))});
+// swipe on touch screens (not on sim slides, where dragging belongs to the simulation)
+let tx=null;
+window.addEventListener('touchstart',e=>{tx=slides[cur].classList.contains('sim')?null:e.touches[0].clientX},{passive:true});
+window.addEventListener('touchend',e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>60)(dx<0?next:prev)();tx=null});
+
+// ---------- overview (O) ----------
+const ov=document.getElementById('ov');
+const titleOf=s=>s.dataset.title||(s.querySelector('h2')||s.querySelector('h1')||{textContent:''}).textContent.trim();
+(function(){
+  let html='',sec=null;
+  slides.forEach((s,i)=>{
+    const t=s.dataset.section||'';
+    if(t!==sec){if(sec!==null)html+='</div>';html+='<h3>'+(t||'Start')+'</h3><div class="grid">';sec=t}
+    html+='<a data-i="'+i+'" class="'+(isLive(s)?'live':'')+'"><span class="n">'+(i+1)+'</span><span>'+titleOf(s)+'</span></a>';
+  });
+  document.getElementById('ovBody').innerHTML=html+'</div>';
+  document.querySelectorAll('#ov a').forEach(a=>a.onclick=()=>{toggleOv();show(+a.dataset.i,1)});
+  // closing slide: list of the live demos
+  document.getElementById('demoList').innerHTML=slides.map((s,i)=>isLive(s)?
+    '<li><a data-i="'+i+'" style="color:var(--blue);cursor:pointer">'+titleOf(s).replace('Live demo: ','')+'</a> <span class="muted xs">(slide '+(i+1)+')</span></li>':'').join('');
+  document.querySelectorAll('#demoList a').forEach(a=>a.onclick=()=>show(+a.dataset.i,1));
+})();
+function toggleOv(){ov.classList.toggle('open');markOverview()}
+function markOverview(){document.querySelectorAll('#ov a').forEach(a=>a.classList.toggle('cur',+a.dataset.i===cur))}
+counter.onclick=toggleOv;
+
+// ---------- shared helpers for the two interactive figures ----------
+const NS='http://www.w3.org/2000/svg';
+function el(parent,tag,attrs,text){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;parent.appendChild(e);return e}
+function erf(x){const s=Math.sign(x);x=Math.abs(x);const t=1/(1+0.3275911*x);
+  return s*(1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x))}
+const Phi=x=>0.5*(1+erf(x/Math.SQRT2));
+const phi=x=>Math.exp(-x*x/2)/Math.sqrt(2*Math.PI);
+function svgX(svg,evt){const p=svg.createSVGPoint();p.x=evt.clientX;p.y=evt.clientY;return p.matrixTransform(svg.getScreenCTM().inverse()).x}
+function dragger(svg,active,onX){
+  let on=false;
+  svg.addEventListener('pointerdown',e=>{if(!active())return;on=true;svg.setPointerCapture(e.pointerId);onX(svgX(svg,e))});
+  svg.addEventListener('pointermove',e=>{if(on)onX(svgX(svg,e))});
+  svg.addEventListener('pointerup',()=>{on=false});
+}
+
+// ---------- the t statistic if H0 is true (4 steps, as in the beamer slide) ----------
+(function(){
+  const svg=document.getElementById('tsvg'), slide=document.getElementById('tdist');
+  const L=62,R=620,T=34,B=392, X0=-4,X1=4,Y1=0.47;
+  const sx=x=>L+(x-X0)/(X1-X0)*(R-L), sy=y=>B-y/Y1*(B-T);
+  const area=(a,b)=>{let d='M'+sx(a)+','+sy(0);for(let i=0;i<=60;i++){const x=a+(b-a)*i/60;d+='L'+sx(x).toFixed(1)+','+sy(phi(x)).toFixed(1)}return d+'L'+sx(b)+','+sy(0)+'Z'};
+  // axes
+  el(svg,'line',{x1:L,y1:B,x2:R,y2:B,stroke:'#1c2330','stroke-width':1.5});
+  el(svg,'line',{x1:L,y1:B,x2:L,y2:T-6,stroke:'#1c2330','stroke-width':1.5});
+  for(let x=-4;x<=4;x+=2){el(svg,'line',{x1:sx(x),y1:B,x2:sx(x),y2:B+6,stroke:'#1c2330'});el(svg,'text',{x:sx(x),y:B+24,'text-anchor':'middle','font-size':15,fill:'#374151'},x<0?'−'+(-x):x)}
+  for(const y of [0,.1,.2,.3,.4]){el(svg,'line',{x1:L-6,y1:sy(y),x2:L,y2:sy(y),stroke:'#1c2330'});el(svg,'text',{x:L-10,y:sy(y)+5,'text-anchor':'end','font-size':15,fill:'#374151'},y===0?'0':y.toFixed(1))}
+  el(svg,'text',{x:(L+R)/2,y:B+50,'text-anchor':'middle','font-size':17,fill:'#1c2330'},'t statistic');
+  el(svg,'text',{x:16,y:(T+B)/2,'text-anchor':'middle','font-size':17,fill:'#1c2330',transform:'rotate(-90 16 '+(T+B)/2+')'},'Density');
+  // step 3: 5% rejection region
+  const g3=el(svg,'g',{'data-on':'3-'});
+  el(g3,'path',{d:area(1.96,4),fill:'#93b4f5',opacity:.75});el(g3,'path',{d:area(-4,-1.96),fill:'#93b4f5',opacity:.75});
+  // step 4: p-value tails (redrawn when t moves)
+  const g4=el(svg,'g',{'data-on':'4-'});
+  const tailR=el(g4,'path',{fill:'#e25555',opacity:.85}), tailL=el(g4,'path',{fill:'#e25555',opacity:.85});
+  // step 2: the imagined distribution
+  const g2=el(svg,'g',{'data-on':'2-'});
+  let d='';for(let i=0;i<=240;i++){const x=X0+(X1-X0)*i/240;d+=(i?'L':'M')+sx(x).toFixed(1)+','+sy(phi(x)).toFixed(1)}
+  el(g2,'path',{d,fill:'none',stroke:'#1c2330','stroke-width':3.2});
+  el(g2,'text',{x:sx(0),y:sy(0.25),'text-anchor':'middle','font-size':15,fill:'#1c2330'},'imagined,');
+  el(g2,'text',{x:sx(0),y:sy(0.25)+19,'text-anchor':'middle','font-size':15,fill:'#1c2330'},'if H₀ true');
+  // step 3: cutoffs and labels
+  for(const c of [-1.96,1.96]){
+    el(g3,'line',{x1:sx(c),y1:sy(0),x2:sx(c),y2:sy(0.30),stroke:'#1d4ed8','stroke-width':2,'stroke-dasharray':'6 5'});
+    el(g3,'text',{x:sx(c),y:sy(0.30)-7,'text-anchor':'middle','font-size':15,fill:'#1d4ed8'},c<0?'−1.96':'1.96');
+  }
+  el(g3,'text',{x:sx(0),y:sy(0.12),'text-anchor':'middle','font-size':16,'font-weight':600,fill:'#1c2330'},'95%');
+  for(const x of [-3.4,3.4]){el(g3,'text',{x:sx(x),y:sy(0.115),'text-anchor':'middle','font-size':15,fill:'#1d4ed8'},'2.5%');el(g3,'text',{x:sx(x),y:sy(0.115)+18,'text-anchor':'middle','font-size':15,fill:'#1d4ed8'},'reject')}
+  // step 1: our t (always visible); step 4: its mirror image
+  const tl=el(svg,'line',{y1:sy(0),y2:sy(0.40),stroke:'#c81e1e','stroke-width':4});
+  const tt=el(svg,'text',{y:sy(0.40)-9,'text-anchor':'middle','font-size':16,'font-weight':700,fill:'#c81e1e'});
+  const ml=el(g4,'line',{y1:sy(0),y2:sy(0.40),stroke:'#c81e1e','stroke-width':2.5,'stroke-dasharray':'7 5'});
+  const mt=el(g4,'text',{y:sy(0.40)-9,'text-anchor':'middle','font-size':15,fill:'#c81e1e'});
+  const hit=el(svg,'rect',{x:L,y:T,width:R-L,height:B-T,fill:'transparent'});
+  const fmtT=v=>(v<0?'−':'')+Math.abs(v).toFixed(2);
+  let t=2.71;
+  function draw(){
+    const a=Math.abs(t);
+    tl.setAttribute('x1',sx(t));tl.setAttribute('x2',sx(t));tt.setAttribute('x',sx(t));tt.textContent='our t = '+fmtT(t);
+    ml.setAttribute('x1',sx(-t));ml.setAttribute('x2',sx(-t));mt.setAttribute('x',sx(-t));mt.textContent=fmtT(-t);
+    tailR.setAttribute('d',area(a,4));tailL.setAttribute('d',area(-4,-a));
+    const p=2*(1-Phi(a));
+    document.getElementById('pPct').textContent=(p<0.001?'< 0.1':(p*100).toFixed(1))+'%';
+    document.getElementById('pVal').textContent=p<0.001?'< 0.001':p.toFixed(3);
+    document.getElementById('pConc').textContent=p<0.01?'we reject H₀ even at the 1% level':p<0.05?'we reject H₀ at the 5% level (but not at the 1% level)':'we cannot reject H₀ at the 5% level';
+  }
+  dragger(svg,()=>step>=4,x=>{t=Math.round(Math.max(-3.9,Math.min(3.9,X0+(x-L)/(R-L)*(X1-X0)))*100)/100;draw()});
+  slide.addEventListener('step',e=>{hit.classList.toggle('drag',e.detail>=4);if(e.detail<4&&t!==2.71){t=2.71;draw()}});
+  document.getElementById('tReset').onclick=()=>{t=2.71;draw()};
+  draw();
+})();
+
+// ---------- the confidence interval as a picture (3 steps; drag H0 at step 3) ----------
+(function(){
+  const svg=document.getElementById('cisvg'), slide=document.getElementById('cipic');
+  // Stata: b = .0457963, se = .016902, 95% CI [.0124211, .0791715]
+  const b=0.0457963, se=0.016902, lo=0.0124211, hi=0.0791715;
+  const L=70,R=950, V0=-0.025,V1=0.105, AY=200, IY=120;
+  const sx=v=>L+(v-V0)/(V1-V0)*(R-L);
+  el(svg,'line',{x1:L-20,y1:AY,x2:R+20,y2:AY,stroke:'#1c2330','stroke-width':2});
+  el(svg,'path',{d:'M'+(R+20)+','+(AY-6)+'L'+(R+32)+','+AY+'L'+(R+20)+','+(AY+6)+'Z',fill:'#1c2330'});
+  el(svg,'text',{x:R+30,y:AY+30,'font-size':22,'font-style':'italic',class:'mathfont',fill:'#1c2330'},'β');
+  for(let v=-0.02;v<=0.1001;v+=0.02){el(svg,'line',{x1:sx(v),y1:AY-5,x2:sx(v),y2:AY+5,stroke:'#1c2330'});
+    el(svg,'text',{x:sx(v),y:AY+26,'text-anchor':'middle','font-size':16,fill:'#374151'},Math.abs(v)<1e-9?'0':(v<0?'−':'')+Math.abs(v).toFixed(2))}
+  // interval
+  el(svg,'line',{x1:sx(lo),y1:IY,x2:sx(hi),y2:IY,stroke:'#1d4ed8','stroke-width':9});
+  for(const v of [lo,hi]){el(svg,'line',{x1:sx(v),y1:IY-15,x2:sx(v),y2:IY+15,stroke:'#1d4ed8','stroke-width':3});
+    el(svg,'text',{x:sx(v),y:IY+38,'text-anchor':'middle','font-size':16,fill:'#1d4ed8'},v.toFixed(3))}
+  el(svg,'text',{x:sx(b),y:IY-30,'text-anchor':'middle','font-size':19,'font-weight':600,fill:'#1d4ed8'},'95% confidence interval');
+  el(svg,'circle',{cx:sx(b),cy:IY,r:9,fill:'#1c2330'});
+  const bl=el(svg,'text',{x:sx(b),y:IY+38,'text-anchor':'middle','font-size':16,fill:'#1c2330'});
+  el(bl,'tspan',{class:'mathfont','font-style':'italic'},'β̂');el(bl,'tspan',{},' = 0.046');
+  // the null value
+  const h0=el(svg,'line',{y1:AY-4,y2:48,stroke:'#c81e1e','stroke-width':3,'stroke-dasharray':'9 6'});
+  const h0t=el(svg,'text',{y:36,'text-anchor':'middle','font-size':18,'font-weight':600,fill:'#c81e1e'});
+  const hit=el(svg,'rect',{x:L,y:20,width:R-L,height:AY-10,fill:'transparent'});
+  let v0=0;
+  function draw(){
+    const inside=v0>=lo&&v0<=hi, col=inside?'#15803d':'#c81e1e';
+    h0.setAttribute('x1',sx(v0));h0.setAttribute('x2',sx(v0));h0.setAttribute('stroke',col);
+    h0t.setAttribute('x',sx(v0));h0t.setAttribute('fill',col);h0t.textContent='H₀: β = '+(v0===0?'0':v0.toFixed(3));
+    const t=(b-v0)/se;
+    document.getElementById('ciRead').innerHTML='<b>Try it:</b> drag the dashed line. &nbsp;H₀: β = '+(v0===0?'0':v0.toFixed(3))+
+      ' → t = (0.046 − '+(v0===0?'0':v0.toFixed(3))+') / 0.017 = '+t.toFixed(2)+' → '+
+      (inside?'<span class="no">inside the interval: not rejected</span>':'<span class="yes">outside the interval: rejected</span>');
+  }
+  dragger(svg,()=>step>=3,x=>{v0=Math.round(Math.max(V0,Math.min(V1,V0+(x-L)/(R-L)*(V1-V0)))*1000)/1000;if(Math.abs(v0)<0.0015)v0=0;draw()});
+  slide.addEventListener('step',e=>{hit.classList.toggle('drag',e.detail>=3);if(e.detail<3&&v0!==0){v0=0;draw()}});
+  draw();
+})();
+
+// ---------- start ----------
+fit();
+const m0=location.hash.match(/^#(\d+)(?:\.(\d+))?/);
+show(m0?+m0[1]-1:0,m0?+(m0[2]||1):1);
+</script>
+</body>
+</html>
