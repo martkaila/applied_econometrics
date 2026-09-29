@@ -46,6 +46,27 @@
   .howto ol{margin:8px 0 4px 22px;font-size:14px;display:grid;gap:4px}
   .howto .key{margin:10px 0 4px;padding-top:9px;border-top:1px solid #f0f1f3;font-size:14px}
   .howto .key b{color:#b91c1c}
+  /* the four steps: draw data, fit a line, residuals, squared residuals */
+  .steps{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+  .steps .st{flex:1;min-width:130px;display:flex;align-items:center;gap:8px;border:1px solid #d4d6da;background:#fff;border-radius:10px;
+             padding:7px 10px;font:inherit;font-size:13.5px;font-weight:600;color:#8a909c;cursor:pointer;text-align:left;transition:all .15s}
+  .steps .st .n{display:inline-flex;width:22px;height:22px;border-radius:50%;background:#eef0f2;align-items:center;justify-content:center;font-size:12.5px;flex:none}
+  .steps .st.done{color:#1c2330}
+  .steps .st.done .n{background:#dbe4ff;color:#1d4ed8}
+  .steps .st.on{border-color:#2563eb;color:#1d4ed8;background:#eff4ff}
+  .steps .st.on .n{background:#2563eb;color:#fff}
+  .steps #btnNext{flex:none}
+  .stepmsg{font-size:14px;background:#fbfbf9;border:1px dashed #d4d6da;border-radius:10px;padding:9px 13px;margin-bottom:10px;min-height:46px}
+  .dim{opacity:.35;pointer-events:none}
+  .fade{transition:opacity .35s}
+  .btn:disabled{opacity:.45;cursor:default;transform:none;box-shadow:none}
+</style>
+<!-- embed mode (?embed): used when slides.html shows this page inside a slide. Hides the page header, folds the instructions away and passes arrow keys to the slides. -->
+<script>if(/[?&]embed(=|&|$)/.test(location.search))document.documentElement.classList.add('embed')</script>
+<style>
+  html.embed nav,html.embed .kicker,html.embed h1,html.embed .sub{display:none}
+  html.embed .wrap{max-width:1400px;padding:14px 18px 18px}
+  html.embed .howto{margin:0 0 14px}
 </style>
 </head>
 <body>
@@ -59,11 +80,11 @@
   <details class="howto" open>
     <summary>How to use this simulation</summary>
     <ol>
+      <li>Go through the four steps above the chart with <strong>Next step</strong> (or click a step): <strong>draw the data</strong>, <strong>fit a line</strong>, <strong>show the residuals</strong>, <strong>square the residuals</strong>.</li>
       <li><strong>Move the blue line.</strong> Drag its middle to shift it up or down, or drag near one of its ends to tilt it. The two sliders on the right do the same.</li>
-      <li>Each red segment is a <strong>residual</strong>: actual minus predicted earnings. Each orange square is that residual <strong>squared</strong>. The total area of the squares is the <strong>sum of squared residuals</strong>, shown on the right.</li>
-      <li>Make that sum as small as you can. The chart at the bottom shows where your line (orange dot) sits on the "bowl" of possible lines.</li>
-      <li>Click <strong>Reveal the OLS line</strong> to see the best possible line and compare it with yours.</li>
-      <li>Click <strong>New sample</strong> to try again with 40 different men.</li>
+      <li>In step 3, each red segment is a <strong>residual</strong>: actual minus predicted earnings. Try to make their plain sum zero: many bad lines manage it, because positive and negative residuals cancel.</li>
+      <li>In step 4, each orange square is a residual <strong>squared</strong>. Make their total area, the <strong>sum of squared residuals</strong>, as small as you can. The chart at the bottom shows where your line (orange dot) sits on the "bowl" of possible lines.</li>
+      <li>Click <strong>Reveal the OLS line</strong> to see the best possible line, and <strong>New sample</strong> to try again with 40 different men.</li>
     </ol>
     <p class="key"><b>Key idea:</b> OLS chooses the intercept and slope that minimise the sum of squared residuals, Σ(Y<sub>i</sub> − α − βX<sub>i</sub>)².</p>
   </details>
@@ -71,24 +92,34 @@
 
 <main class="layout">
   <section class="card">
+    <div class="steps" id="steps">
+      <button class="st" data-s="1"><span class="n">1</span>Draw the data</button>
+      <button class="st" data-s="2"><span class="n">2</span>Fit a line</button>
+      <button class="st" data-s="3"><span class="n">3</span>Show the residuals</button>
+      <button class="st" data-s="4"><span class="n">4</span>Square the residuals</button>
+      <button class="btn primary" id="btnNext">Next step →</button>
+    </div>
+    <div class="stepmsg" id="stepMsg"></div>
     <canvas id="plot"></canvas>
   </section>
 
   <aside class="card">
-    <div class="eq" id="eq"></div>
-    <div class="ctl">
+    <div class="eq fade" id="eq"></div>
+    <div class="ctl fade" id="ctlA">
       <label>Intercept α (earnings at 0 years) <span class="val" id="alVal"></span></label>
       <input type="range" id="al" min="-25" max="35" step="0.1">
     </div>
-    <div class="ctl">
+    <div class="ctl fade" id="ctlB">
       <label>Slope β (per extra year) <span class="val" id="slVal"></span></label>
       <input type="range" id="sl" min="-1" max="4" step="0.01">
     </div>
 
-    <div class="readout">
-      <div class="lbl">Sum of squared residuals: your line</div>
+    <div class="readout fade" id="nowBox">
+      <div class="lbl" id="nowLbl">Sum of squared residuals: your line</div>
       <div class="num" id="ssrNow">–</div>
+      <div class="small" id="nowTxt"></div>
     </div>
+    <div class="fade" id="later">
     <div class="readout">
       <div class="lbl">Your best so far</div>
       <div class="num" id="ssrBest">–</div>
@@ -103,18 +134,15 @@
       <div class="num green" id="ssrOls">???</div>
       <div class="small" id="gap"></div>
     </div>
-
-    <div class="toggles">
-      <label><input type="checkbox" id="chkResid" checked> Show residuals</label>
-      <label><input type="checkbox" id="chkSq" checked> Show squared residuals (as squares)</label>
     </div>
+
     <div class="btnrow">
       <button class="btn primary" id="btnReveal">Reveal the OLS line</button>
       <button class="btn" id="btnNew">New sample</button>
     </div>
   </aside>
 
-  <section class="card losscard">
+  <section class="card losscard fade" id="lossCard">
     <h2>The minimisation problem, live</h2>
     <p class="small">The black curve is the smallest sum of squared residuals you can get with each slope, if the intercept is also chosen as well as possible.
     The <span style="color:#ea8c1f;font-weight:700">orange dot</span> is your current line; it sits above the curve whenever your intercept is off.
@@ -193,21 +221,22 @@ function drawPlot(){
 
   g.save();g.beginPath();g.rect(M.l,M.t,w-M.l-M.r,h-M.t-M.b);g.clip();
   const yhat=x=>level+slope*(x-XC);
-  const showR=document.getElementById('chkResid').checked, showS=document.getElementById('chkSq').checked;
+  // each layer grows in when its step starts: 0 = hidden, 1 = fully drawn
+  const gS=grow.sq, gR=grow.res, gL=grow.line, gD=grow.dots;
   let maxR=1e-9;
   for(let i=0;i<N;i++){const e=Math.abs(ys[i]-yhat(xs[i]));if(e>maxR)maxR=e}
   for(let i=0;i<N;i++){
     const px=sx(xs[i],w), py=sy(ys[i],h), ph=sy(yhat(xs[i]),h);
     const t=Math.abs(ys[i]-yhat(xs[i]))/maxR;
-    if(showS){
-      const side=Math.abs(py-ph), top=Math.min(py,ph);
+    if(gS>0){   // square grows out of the line, towards the point and to the right
+      const side=Math.abs(py-ph)*gS, top=py<ph?ph-side:ph;
       g.fillStyle='hsla('+(42-24*t)+',92%,52%,'+(0.08+0.20*t)+')';
       g.strokeStyle='hsla('+(42-24*t)+',85%,40%,'+(0.25+0.35*t)+')';g.lineWidth=1;
       g.fillRect(px,top,side,side);g.strokeRect(px,top,side,side);
     }
-    if(showR){
-      g.strokeStyle='rgba(220,38,38,'+(0.35+0.4*t)+')';g.lineWidth=1.4;
-      g.beginPath();g.moveTo(px,py);g.lineTo(px,ph);g.stroke();
+    if(gR>0){   // residual grows from the line to the point
+      g.strokeStyle='rgba(220,38,38,'+(0.45+0.45*t)+')';g.lineWidth=gS>0?1.4:2.2;
+      g.beginPath();g.moveTo(px,ph);g.lineTo(px,ph+(py-ph)*gR);g.stroke();
     }
   }
   if(revealed){
@@ -215,13 +244,19 @@ function drawPlot(){
     g.beginPath();g.moveTo(sx(X0,w),sy(st.olsLevel+st.b*(X0-XC),h));g.lineTo(sx(X1,w),sy(st.olsLevel+st.b*(X1-XC),h));g.stroke();
     g.setLineDash([]);
   }
-  g.lineCap='round';
-  g.strokeStyle='rgba(37,99,235,.16)';g.lineWidth=9;
-  g.beginPath();g.moveTo(sx(X0,w),sy(yhat(X0),h));g.lineTo(sx(X1,w),sy(yhat(X1),h));g.stroke();
-  g.strokeStyle='#2563eb';g.lineWidth=3;
-  g.beginPath();g.moveTo(sx(X0,w),sy(yhat(X0),h));g.lineTo(sx(X1,w),sy(yhat(X1),h));g.stroke();
-  for(let i=0;i<N;i++){
-    g.beginPath();g.arc(sx(xs[i],w),sy(ys[i],h),4,0,7);
+  if(gL>0){   // the line is drawn from left to right
+    const xe=X0+(X1-X0)*gL;
+    g.lineCap='round';
+    g.strokeStyle='rgba(37,99,235,.16)';g.lineWidth=9;
+    g.beginPath();g.moveTo(sx(X0,w),sy(yhat(X0),h));g.lineTo(sx(xe,w),sy(yhat(xe),h));g.stroke();
+    g.strokeStyle='#2563eb';g.lineWidth=3;
+    g.beginPath();g.moveTo(sx(X0,w),sy(yhat(X0),h));g.lineTo(sx(xe,w),sy(yhat(xe),h));g.stroke();
+  }
+  for(let i=0;i<N;i++){   // dots pop in one after another
+    const u=Math.max(0,Math.min(1,(gD-i/N*0.8)/0.2));
+    if(u<=0)continue;
+    const r=4*(1+0.6*Math.sin(Math.PI*u))*(u<1?u:1);
+    g.beginPath();g.arc(sx(xs[i],w),sy(ys[i],h),Math.max(0.5,r),0,7);
     g.fillStyle='#1c2330';g.fill();g.strokeStyle='#fff';g.lineWidth=1.2;g.stroke();
   }
   g.restore();
@@ -316,25 +351,36 @@ function confettiBurst(){
 }
 
 function onUserChange(){
-  const cur=ssr(level,slope);
-  best=Math.min(best,cur);
-  trail.push({b:slope,s:cur});if(trail.length>30)trail.shift();
-  if(!celebrated&&cur<=st.olsSSR*1.005){celebrated=true;confettiBurst()}
+  if(step>=4){   // the score only counts once the squares are on the screen
+    const cur=ssr(level,slope);
+    best=Math.min(best,cur);
+    trail.push({b:slope,s:cur});if(trail.length>30)trail.shift();
+    if(!celebrated&&cur<=st.olsSSR*1.005){celebrated=true;confettiBurst()}
+  }
   drawAll();
 }
 
 function updateReadouts(){
   const cur=ssr(level,slope), a=level-slope*XC;
-  document.getElementById('ssrNow').textContent=fmt(cur,0);
-  document.getElementById('ssrBest').textContent=best===Infinity?'–':fmt(best,0);
+  const nowLbl=document.getElementById('nowLbl'), nowTxt=document.getElementById('nowTxt');
+  if(step===3){
+    let s=0;for(let i=0;i<N;i++)s+=ys[i]-(level+slope*(xs[i]-XC));
+    nowLbl.textContent='Sum of residuals (not squared)';
+    document.getElementById('ssrNow').textContent=(s<-0.05?'−':s>0.05?'+':'')+fmt(Math.abs(s),1);
+    nowTxt.innerHTML=Math.abs(s)<N*0.5?'Close to zero, but look at the line: positive and negative residuals <b>cancel</b>. That is why step 4 squares them.'
+      :'Try to make this zero by shifting the line up or down.';
+  }else{
+    nowLbl.textContent='Sum of squared residuals: your line';
+    document.getElementById('ssrNow').textContent=step>=4?fmt(cur,0):'–';
+    nowTxt.textContent=step>=4?'':'appears in step 4';
+  }
+  if(step<4){document.getElementById('ssrBest').textContent='–'}
+  else document.getElementById('ssrBest').textContent=best===Infinity?'–':fmt(best,0);
   document.getElementById('medal').style.display=celebrated?'block':'none';
-  const sgn=(v,d)=>(v<0?'−':'')+fmt(Math.abs(v),d);
-  document.getElementById('eq').innerHTML='predicted earnings ($k) = '+sgn(a,1)+' '+(slope<0?'−':'+')+' '+fmt(Math.abs(slope),2)+' × education';
-  document.getElementById('alVal').textContent=(a<0?'−':'')+'$'+fmt(Math.abs(a),1)+'k';
-  document.getElementById('slVal').textContent=(slope<0?'−':'+')+'$'+fmt(Math.abs(slope),2)+'k';
+  updateEq(a);
   if(revealed){
     document.getElementById('ssrOls').textContent=fmt(st.olsSSR,0);
-    const gapP=(best/st.olsSSR-1)*100;
+    const gapP=(best/st.olsSSR-1)*100, sgn=(v,d)=>(v<0?'−':'')+fmt(Math.abs(v),d);
     document.getElementById('gap').innerHTML='OLS: <span class="bh">α&#770;</span> = '+sgn(st.a,2)+', <span class="bh">β&#770;</span> = '+sgn(st.b,2)+'. Each extra year of education goes with $'+fmt(st.b*1000,0)+' higher annual earnings. '+
       (best===Infinity?'':(gapP<0.5?'Your best is essentially OLS. Well played!':'Your best was '+fmt(gapP,1)+'% above the minimum.'));
   }else{
@@ -342,7 +388,47 @@ function updateReadouts(){
     document.getElementById('gap').textContent='';
   }
 }
+function updateEq(a){
+  const sgn=(v,d)=>(v<0?'−':'')+fmt(Math.abs(v),d);
+  document.getElementById('eq').innerHTML=step<2?'no line yet':'predicted earnings ($k) = '+sgn(a,1)+' '+(slope<0?'−':'+')+' '+fmt(Math.abs(slope),2)+' × education';
+  document.getElementById('alVal').textContent=(a<0?'−':'')+'$'+fmt(Math.abs(a),1)+'k';
+  document.getElementById('slVal').textContent=(slope<0?'−':'+')+'$'+fmt(Math.abs(slope),2)+'k';
+}
 function drawAll(){drawPlot();drawLoss();drawArea();updateReadouts()}
+
+// ---------- the four steps ----------
+let step=1;
+const grow={dots:1,line:1,res:1,sq:1}, LAYER=['dots','line','res','sq'];
+const MSG={
+  1:'<b>Step 1: the data.</b> Each dot is one man: his years of education and his annual earnings. Which straight line describes them best?',
+  2:'<b>Step 2: fit a line.</b> Here is one candidate. Drag it (middle = shift, ends = tilt) or use the sliders. Is it a good fit? Hard to say by eye.',
+  3:'<b>Step 3: the residuals.</b> Each red segment is a <b>residual</b>: actual minus predicted earnings. A good line keeps them small. Could we just add them up? Watch the sum on the right.',
+  4:'<b>Step 4: square the residuals.</b> Each orange square has area residual². Their total is the <b>sum of squared residuals</b>. Drag the line to make it as small as you can: OLS finds the line with the smallest possible total.'
+};
+let animId=0;
+function animate(key,T){
+  const id=++animId, t0=performance.now();
+  grow[key]=0;
+  (function tick(t){
+    if(id!==animId)return;   // cancelled: setStep or a newer animation has set the layers
+    const u=Math.min(1,(t-t0)/T);grow[key]=1-Math.pow(1-u,3);drawPlot();
+    if(u<1)requestAnimationFrame(tick);else drawAll();
+  })(t0);
+}
+function setStep(k,anim){
+  const prev=step;step=k;
+  animId++;
+  LAYER.forEach((key,i)=>{grow[key]=i<k?1:0});
+  if(anim&&k>=prev)animate(LAYER[k-1],k===1?1100:700);
+  document.querySelectorAll('#steps .st').forEach(b=>{const s=+b.dataset.s;b.classList.toggle('on',s===k);b.classList.toggle('done',s<k)});
+  document.getElementById('stepMsg').innerHTML=MSG[k];
+  const nx=document.getElementById('btnNext');nx.disabled=k>=4;nx.textContent=k>=4?'All four steps done':'Next step →';
+  alEl.disabled=slEl.disabled=k<2;
+  ['eq','ctlA','ctlB'].forEach(id=>document.getElementById(id).classList.toggle('dim',k<2));
+  document.getElementById('nowBox').classList.toggle('dim',k<3);
+  ['later','lossCard'].forEach(id=>document.getElementById(id).classList.toggle('dim',k<4));
+  drawAll();
+}
 
 // ---------- interactions ----------
 const alEl=document.getElementById('al'), slEl=document.getElementById('sl');
@@ -356,6 +442,7 @@ function mouseData(e){
   return {x:X0+(e.offsetX-M.l)/(w-M.l-M.r)*(X1-X0), y:Y0+((PH-M.b-e.offsetY)/(PH-M.b-M.t))*(Y1-Y0)};
 }
 function nearLine(e){
+  if(step<2)return false;   // no line to grab in step 1
   const w=plot.clientWidth||600;
   const x1=sx(X0,w),y1=sy(level+slope*(X0-XC),PH), x2=sx(X1,w),y2=sy(level+slope*(X1-XC),PH);
   const dx=x2-x1,dy=y2-y1;
@@ -378,10 +465,13 @@ plot.addEventListener('pointerdown',e=>{
 });
 plot.addEventListener('pointerup',()=>{drag=null;plot.style.cursor='default'});
 plot.addEventListener('pointercancel',()=>{drag=null});
-document.getElementById('chkResid').addEventListener('change',drawAll);
-document.getElementById('chkSq').addEventListener('change',drawAll);
+document.getElementById('steps').addEventListener('click',e=>{
+  const b=e.target.closest('.st');if(b)setStep(+b.dataset.s,true);
+});
+document.getElementById('btnNext').addEventListener('click',()=>{if(step<4)setStep(step+1,true)});
 
 document.getElementById('btnReveal').addEventListener('click',()=>{
+  if(step<4)setStep(4,false);
   revealed=true;
   const l0=level,s0=slope,l1=st.olsLevel,s1=st.b,T=750,t0=performance.now();
   (function step(t){
@@ -395,12 +485,28 @@ document.getElementById('btnNew').addEventListener('click',()=>{
   seed=Math.floor(Math.random()*1e9);
   genData();best=Infinity;revealed=false;trail=[];celebrated=false;
   level=14;slope=0.2;syncSliders();drawAll();
+  animate('dots',900);   // the new men pop in; the current step stays
 });
 window.addEventListener('resize',drawAll);
 
+// ?step=1..4 opens at that step (default 1); ?reveal jumps to step 4 with the OLS line shown
 genData();
-if(new URLSearchParams(location.search).has('reveal')){revealed=true;level=st.olsLevel;slope=st.b}
-syncSliders();drawAll();
+const q=new URLSearchParams(location.search);
+if(q.has('reveal')){revealed=true;level=st.olsLevel;slope=st.b}
+syncSliders();
+setStep(q.has('reveal')?4:Math.max(1,Math.min(4,+q.get('step')||1)),!q.has('step')&&!q.has('reveal'));
+</script>
+<script>
+// embed mode: start with the instructions folded, and send slide-navigation keys to the parent slides
+if(document.documentElement.classList.contains('embed')){
+  document.querySelectorAll('details.howto').forEach(d=>d.removeAttribute('open'));
+  window.addEventListener('keydown',e=>{
+    const t=e.target, tag=t&&t.tagName;
+    if(tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA')return;
+    if(e.key===' '&&(tag==='BUTTON'||tag==='SUMMARY'))return;
+    if(['ArrowRight','ArrowLeft','PageDown','PageUp',' ','Escape'].includes(e.key)){e.preventDefault();parent.postMessage({deckKey:e.key},'*')}
+  });
+}
 </script>
 </body>
 </html>

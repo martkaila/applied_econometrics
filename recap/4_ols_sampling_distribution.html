@@ -57,6 +57,13 @@
   .howto .key{margin:10px 0 4px;padding-top:9px;border-top:1px solid #f0f1f3;font-size:14px}
   .howto .key b{color:#b91c1c}
 </style>
+<!-- embed mode (?embed): used when slides.html shows this page inside a slide. Hides the page header, folds the instructions away and passes arrow keys to the slides. -->
+<script>if(/[?&]embed(=|&|$)/.test(location.search))document.documentElement.classList.add('embed')</script>
+<style>
+  html.embed nav,html.embed .kicker,html.embed h1,html.embed .sub{display:none}
+  html.embed .wrap{max-width:1400px;padding:14px 18px 18px}
+  html.embed .howto{margin:0 0 14px}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -380,6 +387,18 @@ if(q.has('norm'))document.getElementById('chkNorm').checked=true;
 genCloud();
 if(q.has('auto'))for(let i=0;i<(+q.get('auto')||0);i++)drawSample();
 drawAll();
+</script>
+<script>
+// embed mode: start with the instructions folded, and send slide-navigation keys to the parent slides
+if(document.documentElement.classList.contains('embed')){
+  document.querySelectorAll('details.howto').forEach(d=>d.removeAttribute('open'));
+  window.addEventListener('keydown',e=>{
+    const t=e.target, tag=t&&t.tagName;
+    if(tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA')return;
+    if(e.key===' '&&(tag==='BUTTON'||tag==='SUMMARY'))return;
+    if(['ArrowRight','ArrowLeft','PageDown','PageUp',' ','Escape'].includes(e.key)){e.preventDefault();parent.postMessage({deckKey:e.key},'*')}
+  });
+}
 </script>
 </body>
 </html>

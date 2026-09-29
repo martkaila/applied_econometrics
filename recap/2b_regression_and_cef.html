@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>2b · Regression and the CEF — Econometrics Recap</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  [hidden]{display:none!important}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:#1c2330;line-height:1.5;
+       background:radial-gradient(1100px 520px at 85% -8%,#e8efff 0%,rgba(232,239,255,0) 60%),
+                  radial-gradient(900px 500px at -10% 110%,#fdf3e4 0%,rgba(253,243,228,0) 55%),#f6f6f3}
+  .wrap{max-width:1180px;margin:0 auto;padding:22px 20px 60px}
+  nav a{color:#2563eb;text-decoration:none;font-size:14px}
+  nav a:hover{text-decoration:underline}
+  .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#2563eb;font-weight:600;margin-top:8px}
+  h1{font-size:30px;margin:2px 0 6px;letter-spacing:-.01em}
+  h2{font-size:15.5px;margin-bottom:6px}
+  .sub{color:#5b6472;max-width:920px;margin-bottom:18px}
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:18px;align-items:start}
+  .card{background:#fff;border:1px solid #e7e8ea;border-radius:14px;box-shadow:0 1px 2px rgba(16,24,40,.05);padding:18px}
+  canvas{width:100%;display:block}
+  .small{font-size:13px;color:#5b6472}
+  .lbl2{font-size:12.5px;font-weight:600;margin-bottom:5px;color:#374151}
+  .btn{border:1px solid #d4d6da;background:#fff;color:#1c2330;border-radius:9px;padding:8px 12px;font-size:13.5px;font-weight:600;cursor:pointer;transition:all .15s}
+  .btn:hover{border-color:#9aa0aa;background:#fafafa;transform:translateY(-1px);box-shadow:0 3px 8px rgba(16,24,40,.10)}
+  .btn.primary{background:linear-gradient(135deg,#3b82f6,#1d4fd7);border-color:#1d4fd7;color:#fff}
+  .btn.big{width:100%;padding:10px;font-size:14.5px;margin-bottom:10px}
+  .seg{display:flex;border:1px solid #d4d6da;border-radius:10px;overflow:hidden;margin-bottom:12px}
+  .seg button{flex:1;border:0;background:#fff;padding:8px 2px;font-size:13px;font-weight:600;cursor:pointer;color:#5b6472}
+  .seg button+button{border-left:1px solid #eceef1}
+  .seg button.on{background:#2563eb;color:#fff}
+  .seg.v{flex-direction:column;margin-bottom:14px}
+  .seg.v button{text-align:left;padding:8px 12px}
+  .seg.v button+button{border-left:0;border-top:1px solid #eceef1}
+  .seg.v button b{display:inline-block;width:20px}
+  .box{border:1px solid #eceef1;border-radius:11px;padding:11px 12px 2px;margin-bottom:12px;background:#fcfcfb}
+  .chk{display:flex;align-items:center;gap:8px;font-size:13.5px;margin-bottom:10px;cursor:pointer}
+  .ctl{margin-bottom:12px}
+  .ctl label{display:flex;justify-content:space-between;font-size:13.5px;font-weight:600;margin-bottom:3px}
+  .ctl label .val{font-weight:700;color:#2563eb;font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%;accent-color:#2563eb}
+  .readout{background:#f6f8ff;border:1px solid #dbe4ff;border-radius:11px;padding:9px 14px;margin-bottom:9px}
+  .readout .lbl{font-size:11.5px;letter-spacing:.08em;color:#5b6472;font-weight:600;text-transform:uppercase}
+  .readout.def{background:#f2fbf5;border-color:#cdeed8;font-size:13.5px}
+  table.cmp{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums;margin-top:4px}
+  table.cmp td{padding:3px 0;vertical-align:top}
+  table.cmp td:last-child{text-align:right;font-weight:700;white-space:nowrap;padding-left:8px}
+  table.cmp .off{font-weight:400;color:#6b7280;font-size:12px}
+  table.cmp .tick,table.cmp3 .tick{color:#15803d}
+  table.cmp3{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+  table.cmp3 th{font-size:11.5px;font-weight:600;text-align:right;padding:0 0 4px 6px}
+  table.cmp3 td{text-align:right;font-weight:700;padding:3px 0 3px 6px;white-space:nowrap}
+  table.cmp3 td:first-child{text-align:left;font-weight:600;padding-left:0}
+  table.cmp3 .off{font-weight:400;color:#6b7280;font-size:11.5px}
+  .c-red{color:#b91c1c}.c-orange{color:#c2570b}.c-blue{color:#1d4ed8}.c-green{color:#15803d}
+  .code{font-family:Consolas,'Courier New',monospace;font-size:12.5px;background:#1c2330;color:#e5e7eb;border-radius:9px;padding:8px 11px;margin-bottom:9px;white-space:pre;overflow-x:auto;line-height:1.45}
+  .code .cmd{color:#93c5fd}
+  .code .out{color:#fcd34d}
+  .msg{border-radius:11px;padding:11px 13px;font-size:13.5px;background:#fbfbf9;border:1px dashed #d4d6da}
+  .bh{font-family:'Cambria Math',Cambria,Georgia,serif;font-style:normal}
+  .howto{background:#fff;border:1px solid #e7e8ea;border-left:4px solid #2563eb;border-radius:12px;padding:10px 18px;margin:-4px 0 18px;box-shadow:0 1px 2px rgba(16,24,40,.05)}
+  .howto summary{cursor:pointer;font-weight:700;font-size:14.5px;color:#1d4ed8;padding:2px 0}
+  .howto ol{margin:8px 0 4px 22px;font-size:14px;display:grid;gap:4px}
+  .howto .key{margin:10px 0 4px;padding-top:9px;border-top:1px solid #f0f1f3;font-size:14px}
+  .howto .key b{color:#b91c1c}
+  @media(max-width:900px){.layout{grid-template-columns:1fr}}
+</style>
+<!-- embed mode (?embed): used when slides.html shows this page inside a slide. Hides the page header, folds the instructions away and passes arrow keys to the slides. -->
+<script>if(/[?&]embed(=|&|$)/.test(location.search))document.documentElement.classList.add('embed')</script>
+<style>
+  html.embed nav,html.embed .kicker,html.embed h1,html.embed .sub{display:none}
+  html.embed .wrap{max-width:1400px;padding:14px 18px 18px}
+  html.embed .howto{margin:0 0 14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <nav><a href="index.html">← All simulations</a></nav>
+  <div class="kicker">Econometrics · Recap · Simulation 2b</div>
+  <h1>Regression and the conditional expectation function</h1>
+  <p class="sub">Our aim is the <strong>conditional expectation function (CEF)</strong>, E[Y<sub>i</sub> | X<sub>i</sub> = x]: the average of Y at each value of X.
+  Here Y is log weekly wage and X is years of education. The data come from a made-up population, so, unlike in real research, we know the true CEF and can check whether regression finds it.</p>
+  <details class="howto" open>
+    <summary>How to use this simulation</summary>
+    <ol>
+      <li><strong>Draw the data.</strong> Each dot is a man. Click <strong>Draw new data</strong> a few times.</li>
+      <li><strong>The mean of Y.</strong> A regression with no explanatory variables, only a constant, gives exactly the average of Y.</li>
+      <li><strong>The CEF at one value of x.</strong> Move the slider. Compare the average computed by hand (only the men with x years) with the regression answer <span class="bh">α&#770;</span> + <span class="bh">β&#770;</span>x.</li>
+      <li><strong>Is it the right number?</strong> Compare both with the true CEF. Then change the <strong>true relationship</strong> to Curved or Irregular, and try N = 20,000.</li>
+      <li><strong>A saturated model.</strong> Split the men into low and high education and regress Y on this 0/1 variable. Check that the regression recovers both group averages exactly, whatever the true relationship.</li>
+    </ol>
+    <p class="key"><b>Key idea:</b> OLS estimates the CEF. If the CEF is a straight line, a linear regression recovers it; if not, it gives the best linear approximation. A saturated regression, with one parameter for every value of X (for example, a regression on a single 0/1 variable), always recovers the CEF.</p>
+  </details>
+</header>
+
+<main class="layout">
+  <section class="card">
+    <h2 id="plotTitle"></h2>
+    <canvas id="plot"></canvas>
+  </section>
+
+  <aside class="card">
+    <div class="lbl2">Choose a step</div>
+    <div class="seg v" id="segStep">
+      <button data-s="1" class="on"><b>1</b>Draw the data</button>
+      <button data-s="2"><b>2</b>The mean of Y</button>
+      <button data-s="3"><b>3</b>The CEF at one value of x</button>
+      <button data-s="4"><b>4</b>Is it the right number?</button>
+      <button data-s="5"><b>5</b>A saturated model: low vs high education</button>
+    </div>
+
+    <div class="box">
+      <button class="btn primary big" id="bDraw">Draw new data</button>
+      <div class="lbl2">Men in the data, N</div>
+      <div class="seg" id="segN"><button data-n="165" class="on">165</button><button data-n="1000">1,000</button><button data-n="20000">20,000</button></div>
+      <div class="lbl2">True relationship in the population (the DGP)</div>
+      <div class="seg" id="segDGP"><button data-d="lin" class="on">Straight line</button><button data-d="curve">Curved</button><button data-d="wavy">Irregular</button></div>
+    </div>
+
+    <div id="xBox" hidden>
+      <div class="ctl" id="xRow">
+        <label>Education level x <span class="val" id="xVal"></span></label>
+        <input type="range" id="xs" min="8" max="20" step="1" value="12">
+      </div>
+      <label class="chk"><input type="checkbox" id="chkZoom"> Zoom in on the averages</label>
+      <label class="chk" id="meansRow" hidden><input type="checkbox" id="chkMeans" checked> Show the averages computed by hand</label>
+    </div>
+
+    <div id="ro"></div>
+    <div class="msg" id="msg"></div>
+  </aside>
+</main>
+</div>
+
+<script>
+'use strict';
+function gaussR(r){let u=0,v=0;while(u===0)u=r();while(v===0)v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+const gauss=()=>gaussR(Math.random);
+function fmt(x,d){return x.toLocaleString('en-GB',{minimumFractionDigits:d,maximumFractionDigits:d})}
+const sgn=(v,d)=>(v<0?'−':'')+fmt(Math.abs(v),d);
+const $=id=>document.getElementById(id);
+const AH='<span class="bh">α&#770;</span>', BH='<span class="bh">β&#770;</span>', DH='<span class="bh">δ&#770;</span>';
+function ctx2d(cv,h){
+  const dpr=window.devicePixelRatio||1, w=cv.clientWidth||600;
+  cv.width=w*dpr;cv.height=h*dpr;cv.style.height=h+'px';
+  const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);
+  return {g,w,h};
+}
+// canvas text containing α̂ or β̂: the hat is only placed correctly by a math font
+function fillHat(g,txt,x,y){
+  const re=/([αβ]̂)/;
+  if(!re.test(txt)){g.fillText(txt,x,y);return}
+  const parts=txt.split(re), base=g.font, size=+(base.match(/(\d+(\.\d+)?)px/)||[0,13])[1];
+  const hatFont=(base.match(/^(\d00)\s/)?base.match(/^(\d00)\s/)[1]+' ':'')+(size+1.5)+'px "Cambria Math",Cambria,serif';
+  const isHat=p=>p.length===2&&re.test(p);
+  const wOf=p=>{g.font=isHat(p)?hatFont:base;const w=g.measureText(p).width;g.font=base;return w};
+  const total=parts.reduce((a,p)=>a+wOf(p),0);
+  const al=g.textAlign;let cx=al==='center'?x-total/2:(al==='right'||al==='end')?x-total:x;
+  g.textAlign='left';
+  for(const p of parts){g.font=isHat(p)?hatFont:base;g.fillText(p,cx,y);cx+=g.measureText(p).width}
+  g.font=base;g.textAlign=al;
+}
+
+// ---------- population ----------
+const XS=[8,9,10,11,12,13,14,15,16,17,18,19,20];
+const P=[2,2,3,4,30,8,12,5,18,4,7,2,3];            // CPS-like: bunching at 12 (high school) and 16 (college)
+const PTOT=P.reduce((a,b)=>a+b,0);
+const SG=0.64;
+const DGP={
+  lin:  {name:'a straight line', m:x=>5.31+0.046*x},
+  curve:{name:'curved',          m:x=>5.55+0.01*(x-8)+0.0045*(x-8)**2},
+  wavy: {name:'irregular',       m:x=>5.85+0.03*(x-13)+0.15*Math.sin(0.9*(x-8))}    // an arbitrary shape, no story behind it
+};
+const HIGH=16;                                        // step 5: D = 1 for 16+ years of education (college)
+function trueByD(d){let s=0,w=0;XS.forEach((x,k)=>{if((x>=HIGH?1:0)===d){s+=P[k]*DGP[dgp].m(x);w+=P[k]}});return s/w}
+function drawX(){let u=Math.random()*PTOT;for(let k=0;k<XS.length;k++){u-=P[k];if(u<=0)return XS[k]}return XS[XS.length-1]}
+const trueMean=()=>XS.reduce((a,x,k)=>a+P[k]*DGP[dgp].m(x),0)/PTOT;
+
+let dgp='lin', N=165, D=null, step=1, x0=12, zoomSet=false;
+function newData(){
+  const m=DGP[dgp].m, xs=new Array(N), ys=new Array(N), jit=new Array(N), cnt={}, sum={};
+  let ybar=0;
+  for(let i=0;i<N;i++){const x=drawX(),y=m(x)+SG*gauss();xs[i]=x;ys[i]=y;jit[i]=(Math.random()-.5)*0.5;cnt[x]=(cnt[x]||0)+1;sum[x]=(sum[x]||0)+y;ybar+=y}
+  ybar/=N;
+  let mx=0;for(const x of xs)mx+=x;mx/=N;
+  let sxx=0,sxy=0;for(let i=0;i<N;i++){const dx=xs[i]-mx;sxx+=dx*dx;sxy+=dx*(ys[i]-ybar)}
+  const b=sxy/sxx, a=ybar-b*mx;
+  const mean={};for(const x of XS)if(cnt[x])mean[x]=sum[x]/cnt[x];
+  const obs=XS.filter(x=>cnt[x]);
+  // step 5: regression on the 0/1 variable D = 1[education >= 16]
+  const dd=xs.map(x=>x>=HIGH?1:0);let md=0,n1=0,s0=0,s1=0;
+  for(let i=0;i<N;i++){md+=dd[i];if(dd[i]){n1++;s1+=ys[i]}else s0+=ys[i]}md/=N;
+  let sdd=0,sdy=0;for(let i=0;i<N;i++){const e=dd[i]-md;sdd+=e*e;sdy+=e*(ys[i]-ybar)}
+  const bD=sdy/sdd;
+  const sat={a:ybar-bD*md,b:bD,m0:s0/(N-n1),m1:s1/n1,n0:N-n1,n1};
+  D={xs,ys,jit,cnt,mean,obs,ybar,a,b,sat};
+}
+
+// ---------- drawing ----------
+const plot=$('plot'), PH=500;
+const TITLES={1:'Our data: years of education and log weekly wage',2:'Step 2: a regression with only a constant',3:'Step 3: two ways to estimate E[Y | X = x]',
+  4:'Step 4: compare with the true CEF',5:'Step 5: low vs high education, a saturated regression'};
+function axes(g,w,h,M,X,Y,xt,yt,xlab){
+  const sx=v=>M.l+(v-X[0])/(X[1]-X[0])*(w-M.l-M.r), sy=v=>h-M.b-(v-Y[0])/(Y[1]-Y[0])*(h-M.t-M.b);
+  g.font='12px "Segoe UI",sans-serif';g.lineWidth=1;
+  for(const t of xt){const v=Array.isArray(t)?t[0]:t, l=Array.isArray(t)?t[1]:t;
+    g.strokeStyle='#eef0f2';g.beginPath();g.moveTo(sx(v),M.t);g.lineTo(sx(v),h-M.b);g.stroke();
+    g.fillStyle=Array.isArray(t)?'#374151':'#6b7280';g.textAlign='center';g.textBaseline='top';g.fillText(l,sx(v),h-M.b+8)}
+  for(const v of yt){g.strokeStyle='#eef0f2';g.beginPath();g.moveTo(M.l,sy(v));g.lineTo(w-M.r,sy(v));g.stroke();
+    g.fillStyle='#6b7280';g.textAlign='right';g.textBaseline='middle';g.fillText(fmt(v,Y[1]-Y[0]<3?1:0),M.l-8,sy(v))}
+  g.strokeStyle='#c9ccd2';g.strokeRect(M.l,M.t,w-M.l-M.r,h-M.t-M.b);
+  g.fillStyle='#374151';g.font='600 13px "Segoe UI",sans-serif';g.textAlign='center';g.textBaseline='alphabetic';
+  g.fillText(xlab===undefined?'Years of education':xlab,(M.l+w-M.r)/2,h-8);
+  g.save();g.translate(15,(M.t+h-M.b)/2);g.rotate(-Math.PI/2);g.fillText('Log weekly wage',0,0);g.restore();
+  return {sx,sy};
+}
+function legend(g,x,y,items){
+  let wMax=0;for(const it of items){g.font=(it.bold?'600 ':'')+'12.5px "Segoe UI",sans-serif';wMax=Math.max(wMax,g.measureText(it.txt).width)}
+  g.fillStyle='rgba(255,255,255,.92)';g.fillRect(x-7,y-11,wMax+52,items.length*19+4);
+  items.forEach((it,i)=>{
+    const yy=y+i*19;g.strokeStyle=it.col;g.fillStyle=it.col;g.lineWidth=it.lw||2.6;
+    if(it.type==='dot'){g.beginPath();g.arc(x+13,yy,it.r||4,0,7);g.fill()}
+    else{if(it.type==='dash')g.setLineDash([6,4]);g.beginPath();g.moveTo(x,yy);g.lineTo(x+26,yy);g.stroke();g.setLineDash([])}
+    g.fillStyle=it.tcol||'#374151';g.font=(it.bold?'600 ':'')+'12.5px "Segoe UI",sans-serif';g.textAlign='left';g.textBaseline='middle';
+    fillHat(g,it.txt,x+36,yy);
+  });
+}
+function hbar(g,sx,sy,x,y,half,col,lw){
+  g.lineCap='round';g.strokeStyle='#fff';g.lineWidth=lw+3;g.beginPath();g.moveTo(sx(x-half),sy(y));g.lineTo(sx(x+half),sy(y));g.stroke();
+  g.strokeStyle=col;g.lineWidth=lw;g.beginPath();g.moveTo(sx(x-half),sy(y));g.lineTo(sx(x+half),sy(y));g.stroke();g.lineCap='butt';
+}
+function dot(g,x,y,r,col){g.beginPath();g.arc(x,y,r,0,7);g.fillStyle=col;g.fill();g.strokeStyle='#fff';g.lineWidth=1.8;g.stroke()}
+function label(g,txt,x,y,col){
+  g.font='600 12.5px "Segoe UI",sans-serif';g.textAlign='center';g.textBaseline='middle';
+  const tw=g.measureText(txt).width+6;g.fillStyle='rgba(255,255,255,.92)';g.fillRect(x-tw/2-2,y-9,tw+4,18);
+  g.fillStyle=col;g.fillText(txt,x,y);
+}
+
+// step 5: two groups, D = 0 (less than 16 years) and D = 1 (16+ years)
+function draw5(g,w,h,M){
+  const zoom=$('chkZoom').checked, Y=zoom?[5.2,6.7]:[3.8,8.2], s=D.sat;
+  const {sx,sy}=axes(g,w,h,M,[-0.6,1.6],Y,[[0,'Low education: less than 16 years (D = 0)'],[1,'High education: 16+ years (D = 1)']],
+    zoom?[5.2,5.4,5.6,5.8,6,6.2,6.4,6.6]:[4,5,6,7,8],'');
+  g.save();g.beginPath();g.rect(M.l,M.t,w-M.l-M.r,h-M.t-M.b);g.clip();
+  const r=N>5000?1.2:N>500?2.2:3.2, a=(N>5000?.12:N>500?.3:.5)*(zoom?.5:1);
+  g.fillStyle='rgba(37,99,235,'+a+')';
+  for(let i=0;i<D.xs.length;i++){const d=D.xs[i]>=HIGH?1:0;g.beginPath();g.arc(sx(d+D.jit[i]*0.8),sy(D.ys[i]),r,0,7);g.fill()}
+  g.strokeStyle='#1d4ed8';g.lineWidth=3;g.beginPath();g.moveTo(sx(-0.6),sy(s.a-0.6*s.b));g.lineTo(sx(1.6),sy(s.a+1.6*s.b));g.stroke();
+  for(const d of [0,1]){const t=trueByD(d);g.strokeStyle='#dc2626';g.lineWidth=2.4;g.setLineDash([6,4]);
+    g.beginPath();g.moveTo(sx(d-0.36),sy(t));g.lineTo(sx(d+0.36),sy(t));g.stroke();g.setLineDash([])}
+  hbar(g,sx,sy,0,s.m0,0.28,'#c2570b',5);hbar(g,sx,sy,1,s.m1,0.28,'#c2570b',5);
+  g.restore();
+  label(g,'average: '+fmt(s.m0,3),sx(0),sy(s.m0)-18,'#c2570b');
+  label(g,'average: '+fmt(s.m1,3),sx(1),sy(s.m1)-18,'#c2570b');
+  legend(g,M.l+14,M.t+16,[
+    {type:'dot',col:'rgba(37,99,235,.7)',txt:'one man (spread sideways a little)'},
+    {type:'line',col:'#c2570b',lw:5,txt:'average log wage in each group, computed by hand'},
+    {type:'line',col:'#1d4ed8',txt:'regression on D: α̂ + β̂ D, passes through both averages'},
+    {type:'dash',col:'#dc2626',txt:'true E[Y | D] in the population',bold:true,tcol:'#b91c1c'}]);
+}
+
+function draw(){
+  $('plotTitle').textContent=TITLES[step];
+  const {g,w,h}=ctx2d(plot,PH);g.clearRect(0,0,w,h);
+  const M={l:56,r:16,t:14,b:46};
+  if(step===5){draw5(g,w,h,M);readouts();return}
+  const zoom=step>=3&&$('chkZoom').checked;
+  const Y=zoom?[5.2,6.7]:[3.8,8.2];
+  const {sx,sy}=axes(g,w,h,M,[6.5,21.5],Y,[8,10,12,14,16,18,20],zoom?[5.2,5.4,5.6,5.8,6,6.2,6.4,6.6]:[4,5,6,7,8]);
+  g.save();g.beginPath();g.rect(M.l,M.t,w-M.l-M.r,h-M.t-M.b);g.clip();
+  const m=DGP[dgp].m, line=(a,b)=>{g.beginPath();g.moveTo(sx(6.5),sy(a+b*6.5));g.lineTo(sx(21.5),sy(a+b*21.5));g.stroke()};
+  if(step>=3){g.fillStyle='rgba(234,140,31,.09)';g.fillRect(sx(x0-.5),M.t,sx(x0+.5)-sx(x0-.5),h-M.t-M.b)}
+  // the men
+  const r=N>5000?1.2:N>500?2.2:3.2;let a=N>5000?.12:N>500?.3:.5;if(step>=4)a*=.45;
+  for(let i=0;i<D.xs.length;i++){
+    const hot=step===3&&D.xs[i]===x0;
+    g.fillStyle=hot?'rgba(234,140,31,.8)':'rgba(37,99,235,'+a+')';
+    g.beginPath();g.arc(sx(D.xs[i]+D.jit[i]),sy(D.ys[i]),hot?Math.max(r,2.4):r,0,7);g.fill();
+  }
+  const items=[];
+  if(step===1)items.push({type:'dot',col:'rgba(37,99,235,.7)',txt:'one man (dots are spread sideways a little so they do not overlap)'});
+  if(step===2){
+    g.strokeStyle='#ea8c1f';g.lineWidth=5;line(D.ybar,0);
+    g.strokeStyle='#1d4ed8';g.lineWidth=2.2;g.setLineDash([8,6]);line(D.ybar,0);g.setLineDash([]);
+    items.push({type:'dot',col:'rgba(37,99,235,.7)',txt:'one man'},
+      {type:'line',col:'#ea8c1f',lw:5,txt:'the average of all log wages, computed by hand: Ȳ = '+fmt(D.ybar,3)},
+      {type:'dash',col:'#1d4ed8',txt:'regression with only a constant: α̂ = '+fmt(D.ybar,3)});
+  }
+  if(step>=4){ // the true CEF: known only because we built the population
+    g.strokeStyle='#dc2626';g.lineWidth=2;g.setLineDash([6,4]);g.beginPath();
+    XS.forEach((x,k)=>{if(k)g.lineTo(sx(x),sy(m(x)));else g.moveTo(sx(x),sy(m(x)))});g.stroke();g.setLineDash([]);
+    XS.forEach(x=>dot(g,sx(x),sy(m(x)),4,'#dc2626'));
+  }
+  if(step===3||step===4){g.strokeStyle='#1d4ed8';g.lineWidth=3;line(D.a,D.b)}
+  if(step===4&&$('chkMeans').checked){
+    const nMax=Math.max(...D.obs.map(x=>D.cnt[x]));
+    for(const x of D.obs)dot(g,sx(x),sy(D.mean[x]),3+7*Math.sqrt(D.cnt[x]/nMax),'rgba(234,140,31,.95)');
+  }
+  if(step===3){
+    if(D.mean[x0]!==undefined)hbar(g,sx,sy,x0,D.mean[x0],0.4,'#c2570b',4.5);
+    dot(g,sx(x0),sy(D.a+D.b*x0),6.5,'#1d4ed8');
+  }
+  g.restore();
+  if(step===3)items.push({type:'dot',col:'rgba(234,140,31,.9)',txt:'the '+(D.cnt[x0]||0)+' men with '+x0+' years of education'},
+      {type:'line',col:'#c2570b',lw:5,txt:'their average, computed by hand'},
+      {type:'line',col:'#1d4ed8',txt:'OLS line: α̂ + β̂ × education (● = its value at '+x0+' years)'});
+  if(step===4){items.push({type:'dash',col:'#dc2626',txt:'the true CEF, E[Y | X = x] (known only because the data are simulated)',bold:true,tcol:'#b91c1c'});
+    if($('chkMeans').checked)items.push({type:'dot',col:'#ea8c1f',r:5,txt:'averages computed by hand (bigger = more men)'});
+    items.push({type:'line',col:'#1d4ed8',txt:'OLS line: α̂ + β̂ × education'})}
+  legend(g,M.l+14,M.t+16,items);
+  readouts();
+}
+
+// ---------- readouts and messages ----------
+function readouts(){
+  const ro=$('ro'), msg=$('msg'), m=DGP[dgp].m;
+  const n=D.cnt[x0]||0, hand=D.mean[x0], reg=D.a+D.b*x0, tru=m(x0);
+  const off=v=>' <span class="off">('+(Math.abs(v-tru)<0.0005?'on target':'off by '+fmt(Math.abs(v-tru),3))+')</span>';
+  if(step===1){
+    ro.innerHTML='';
+    msg.innerHTML='Each dot is one man in our data: his years of education and his log weekly wage. Most men have 12 years (high school) or 16 years (college). '+
+      'The data come from a population we made up, with a true relationship we chose: <strong>'+DGP[dgp].name+'</strong>. In real data we never know it. Click <strong>Draw new data</strong> a few times, then go to step 2.';
+  }
+  else if(step===2){
+    ro.innerHTML='<div class="code"><span class="cmd">. summarize log_w_wage</span>\n  mean = <span class="out">'+fmt(D.ybar,4)+'</span>\n<span class="cmd">. reg log_w_wage</span>\n  _cons = <span class="out">'+fmt(D.ybar,4)+'</span></div>'+
+      '<div class="readout"><table class="cmp">'+
+      '<tr><td class="c-orange">Average of Y, by hand: ΣY<sub>i</sub> / N</td><td>'+fmt(D.ybar,4)+'</td></tr>'+
+      '<tr><td class="c-blue">Regression with only a constant: '+AH+'</td><td>'+fmt(D.ybar,4)+' <span class="tick">✓</span></td></tr>'+
+      '<tr><td class="c-red">True mean in the population, E[Y]</td><td>'+fmt(trueMean(),4)+'</td></tr></table></div>';
+    msg.innerHTML='A regression with <strong>no explanatory variables</strong>, only a constant, looks for the single number α that makes Σ(Y<sub>i</sub> − α)² as small as possible. '+
+      'That number is the sample average, so '+AH+' = Ȳ exactly. With no X, OLS estimates E[Y]. Draw new data: Ȳ moves around the true mean from sample to sample.';
+  }
+  else if(step===3){
+    ro.innerHTML='<div class="code"><span class="cmd">. summarize log_w_wage if year_ed == '+x0+'</span>\n  mean = <span class="out">'+(n?fmt(hand,4):'(no obs)')+'</span>   ('+n+' men)\n'+
+      '<span class="cmd">. reg log_w_wage year_ed</span>\n  _cons = '+fmt(D.a,4)+'   year_ed = '+fmt(D.b,4)+'\n'+
+      '<span class="cmd">. display _b[_cons] + _b[year_ed]*'+x0+'</span>\n  <span class="out">'+fmt(reg,4)+'</span></div>'+
+      '<div class="readout"><div class="lbl">Estimates of E[Y | X = '+x0+']</div><table class="cmp">'+
+      '<tr><td class="c-orange">By hand: average of the '+n+' men with '+x0+' years</td><td>'+(n?fmt(hand,3):'none')+'</td></tr>'+
+      '<tr><td class="c-blue">By regression: '+AH+' + '+BH+' × '+x0+'</td><td>'+fmt(reg,3)+'</td></tr></table></div>';
+    msg.innerHTML=n?'Two ways to estimate E[Y | X = '+x0+'], the average log wage of men with '+x0+' years of education. <strong>By hand</strong>: average the men with exactly '+x0+' years (orange). '+
+      '<strong>By regression</strong>: run <em>reg log_w_wage year_ed</em> and plug '+x0+' into '+AH+' + '+BH+'x (blue dot). The two are close but not the same: the average by hand uses only the '+n+' men with '+x0+' years, '+
+      'while the regression uses all '+N.toLocaleString()+' men but assumes the averages lie on a straight line. Move the slider. Which number is right? Go to step 4.':
+      '<strong>Nobody in the data has '+x0+' years of education</strong>, so the average cannot be computed by hand. The regression still gives an answer, because it assumes the averages lie on a straight line. Try another value of x.';
+  }
+  else if(step===4){
+    let gMax=0,gAt=0;for(const x of XS){const d=Math.abs(D.a+D.b*x-m(x));if(d>gMax){gMax=d;gAt=x}}
+    ro.innerHTML='<div class="readout"><div class="lbl">E[Y | X = '+x0+']: estimates vs the truth</div><table class="cmp">'+
+      '<tr><td class="c-red">True CEF</td><td>'+fmt(tru,3)+'</td></tr>'+
+      '<tr><td class="c-orange">By hand ('+n+' men)</td><td>'+(n?fmt(hand,3)+off(hand):'none')+'</td></tr>'+
+      '<tr><td class="c-blue">By regression, '+AH+' + '+BH+' × '+x0+'</td><td>'+fmt(reg,3)+off(reg)+'</td></tr></table></div>'+
+      '<div class="readout"><div class="lbl">Largest gap between the OLS line and the true CEF</div><div style="font-size:18px;font-weight:700">'+fmt(gMax,3)+' <span class="small" style="font-weight:400">at '+gAt+' years</span></div></div>';
+    msg.innerHTML=dgp==='lin'?
+      'The true relationship is a straight line, so the CEF is linear and <strong>OLS = CEF</strong>. The regression answer is off only because of sampling noise. '+
+      (N<20000?'Try N = 20,000: the gap shrinks to almost zero at every x. ':'With N = 20,000 the line lies on the true CEF. ')+'Then switch the true relationship to <strong>Curved</strong> or <strong>Irregular</strong>.':
+      'The true CEF is <strong>not a straight line</strong>, but OLS still fits one. The regression answer is the <strong>best linear approximation</strong> to the CEF: close on average, but wrong at some education levels. '+
+      (N<20000?'Try N = 20,000: the averages computed by hand converge to the true CEF, but the OLS line does not.':'Even with N = 20,000 the OLS line stays away from the true CEF: this gap is not sampling noise, and more data do not remove it.')+
+      ' Move the slider to see where the approximation is good and where it is poor.';
+  }
+  else{
+    const s=D.sat, t0=trueByD(0), t1=trueByD(1);
+    ro.innerHTML='<div class="readout def"><strong>Saturated model:</strong> a regression with a separate parameter for <em>every</em> value the explanatory variable can take. '+
+      'Here D = 1 for men with 16 or more years of education and D = 0 otherwise. D takes 2 values and the regression has 2 parameters (α and β), so it is saturated.</div>'+
+      '<div class="code"><span class="cmd">. gen college = (year_ed >= 16)</span>\n<span class="cmd">. reg log_w_wage college</span>\n  _cons   = '+fmt(s.a,4)+'\n    <span class="out">= average for D = 0</span>\n'+
+      '  college = '+sgn(s.b,4)+'\n    <span class="out">= difference between the averages</span></div>'+
+      '<div class="readout"><table class="cmp3"><tr><th></th><th class="c-orange">by hand</th><th class="c-blue">regression</th><th class="c-red">true</th></tr>'+
+      '<tr><td>E[Y | D = 0] <span class="off">('+s.n0.toLocaleString()+' men)</span></td><td>'+fmt(s.m0,3)+'</td><td>'+fmt(s.a,3)+' <span class="tick">✓</span></td><td>'+fmt(t0,3)+'</td></tr>'+
+      '<tr><td>E[Y | D = 1] <span class="off">('+s.n1.toLocaleString()+' men)</span></td><td>'+fmt(s.m1,3)+'</td><td>'+fmt(s.a+s.b,3)+' <span class="tick">✓</span></td><td>'+fmt(t1,3)+'</td></tr></table>'+
+      '<div class="small" style="margin-top:4px">regression: '+AH+' for D = 0, and '+AH+' + '+BH+' for D = 1</div></div>';
+    msg.innerHTML='D takes only two values and the regression has two parameters, so it matches both group averages <strong>exactly</strong>: _cons is the average for the low-educated, and the coefficient on <em>college</em> is the difference between the two groups. '+
+      'This works <strong>whatever the true relationship</strong> between education and wages: try all three. The only gap to the true E[Y | D] is sampling noise, which shrinks as N grows. '+
+      'Compare step 4, where 2 parameters could not match 13 education levels. The same idea works with more groups: a dummy for every education level (<em>reg log_w_wage i.year_ed</em>) is also saturated and reproduces all 13 averages.';
+  }
+}
+
+// ---------- controls ----------
+function setStep(s){
+  step=s;
+  document.querySelectorAll('#segStep button').forEach(b=>b.classList.toggle('on',+b.dataset.s===s));
+  $('xBox').hidden=s<3;$('xRow').hidden=s===5;$('meansRow').hidden=s!==4;
+  if(s>=4&&!zoomSet){$('chkZoom').checked=true;zoomSet=true}
+  draw();
+}
+function segClick(id,fn){$(id).addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  document.querySelectorAll('#'+id+' button').forEach(x=>x.classList.toggle('on',x===b));fn(b)})}
+$('segStep').addEventListener('click',e=>{const b=e.target.closest('button');if(b)setStep(+b.dataset.s)});
+$('bDraw').addEventListener('click',()=>{newData();draw()});
+segClick('segN',b=>{N=+b.dataset.n;newData();draw()});
+segClick('segDGP',b=>{dgp=b.dataset.d;newData();draw()});
+$('xs').addEventListener('input',()=>{x0=+$('xs').value;$('xVal').textContent=x0+' years';draw()});
+$('chkZoom').addEventListener('change',()=>{zoomSet=true;draw()});
+$('chkMeans').addEventListener('change',draw);
+window.addEventListener('resize',draw);
+
+// ---------- init (?step=4&dgp=wavy&n=20000&x=16 for screenshots) ----------
+const q=new URLSearchParams(location.search);
+if(DGP[q.get('dgp')]){dgp=q.get('dgp');document.querySelectorAll('#segDGP button').forEach(b=>b.classList.toggle('on',b.dataset.d===dgp))}
+if(q.has('n')){N=+q.get('n');document.querySelectorAll('#segN button').forEach(b=>b.classList.toggle('on',+b.dataset.n===N))}
+if(q.has('x')){x0=+q.get('x');$('xs').value=x0}
+$('xVal').textContent=x0+' years';
+newData();
+setStep(+(q.get('step')||1));
+</script>
+<script>
+// embed mode: start with the instructions folded, and send slide-navigation keys to the parent slides
+if(document.documentElement.classList.contains('embed')){
+  document.querySelectorAll('details.howto').forEach(d=>d.removeAttribute('open'));
+  window.addEventListener('keydown',e=>{
+    const t=e.target, tag=t&&t.tagName;
+    if(tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA')return;
+    if(e.key===' '&&(tag==='BUTTON'||tag==='SUMMARY'))return;
+    if(['ArrowRight','ArrowLeft','PageDown','PageUp',' ','Escape'].includes(e.key)){e.preventDefault();parent.postMessage({deckKey:e.key},'*')}
+  });
+}
+</script>
+</body>
+</html>
