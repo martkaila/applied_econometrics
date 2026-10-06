@@ -17,20 +17,21 @@
   h2{font-size:15.5px;margin-bottom:2px}
   .sub{color:#5b6472;max-width:920px;margin-bottom:18px}
   .layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;align-items:start}
+  .left{display:grid;gap:18px;min-width:0}
   .card{background:#fff;border:1px solid #e7e8ea;border-radius:14px;box-shadow:0 1px 2px rgba(16,24,40,.05);padding:18px}
   canvas{width:100%;display:block}
   .small{font-size:13px;color:#5b6472}
-  .ctl{margin-bottom:12px}
+  .ctl{margin-bottom:10px}
   .ctl label{display:flex;justify-content:space-between;font-size:13.5px;font-weight:600;margin-bottom:3px}
   .ctl label .val{font-weight:700;color:#2563eb;font-variant-numeric:tabular-nums}
   input[type=range]{width:100%;accent-color:#2563eb}
-  .btn{border:1px solid #d4d6da;background:#fff;color:#1c2330;border-radius:9px;padding:8px 12px;font-size:13.5px;font-weight:600;cursor:pointer;transition:all .15s}
+  .btn{border:1px solid #d4d6da;background:#fff;color:#1c2330;border-radius:9px;padding:7px 11px;font-size:13.5px;font-weight:600;cursor:pointer;transition:all .15s}
   .btn:hover{border-color:#9aa0aa;background:#fafafa;transform:translateY(-1px);box-shadow:0 3px 8px rgba(16,24,40,.10)}
   .btn.primary{background:linear-gradient(135deg,#3b82f6,#1d4fd7);border-color:#1d4fd7;color:#fff}
   .btn.dark{background:#1c2330;border-color:#1c2330;color:#fff}
   .btn.stata{background:#fff7ed;border-color:#f0c690;color:#9a4a07}
-  .btn:disabled{opacity:.45;cursor:not-allowed}
-  .btnrow{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+  .btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+  .btnrow{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 8px}
   .wide{width:100%;margin-bottom:8px}
   .readout{background:#f6f8ff;border:1px solid #dbe4ff;border-radius:11px;padding:9px 14px;margin-bottom:9px}
   .readout .lbl{font-size:11.5px;letter-spacing:.08em;color:#5b6472;font-weight:600}
@@ -39,18 +40,28 @@
   .readout.hot .num{color:#b91c1c}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
   .study{display:grid;grid-template-columns:1fr 1fr;gap:7px;font-size:13.5px;font-variant-numeric:tabular-nums;margin-bottom:6px}
-  .study div{background:#fbfbf9;border:1px solid #ececea;border-radius:8px;padding:6px 10px}
+  .study.s3{grid-template-columns:1fr 1fr 1fr}
+  .study div{background:#fbfbf9;border:1px solid #ececea;border-radius:8px;padding:5px 9px}
   .study b{display:block;font-size:11px;letter-spacing:.07em;color:#5b6472}
-  .badge{display:inline-block;border-radius:999px;padding:3px 12px;font-size:12.5px;font-weight:700;margin-bottom:10px}
+  .study .ourt span{color:#c2570b;font-weight:700}
+  .study .pv span{color:#b91c1c;font-weight:700}
+  .badge{display:inline-block;border-radius:999px;padding:3px 12px;font-size:12.5px;font-weight:700;margin-bottom:8px}
   .badge.rej{background:#fee2e2;color:#b91c1c}
   .badge.fail{background:#e7eef9;color:#1d4ed8}
+  .step{border:1px solid #e7e8ea;border-radius:11px;padding:8px 12px 4px;margin-bottom:9px;transition:opacity .2s,box-shadow .2s}
+  .step.cur{border-color:#93b4f5;box-shadow:0 0 0 3px rgba(37,99,235,.10)}
+  .step.off{opacity:.5}
+  .stephead{font-size:13.5px;font-weight:700;display:flex;align-items:center;gap:8px}
+  .stephead .n{display:inline-grid;place-items:center;width:21px;height:21px;border-radius:50%;background:#2563eb;color:#fff;font-size:12px;flex:none}
   .msg{border-radius:11px;padding:11px 13px;font-size:13.5px}
   .msg.null{background:#fff7ed;border:1px dashed #f0c690}
   .msg.alt{background:#f2fbf5;border:1px dashed #aedcbe}
   .msg.intro{background:#fbfbf9;border:1px dashed #d4d6da}
-  .bottom{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:18px}
-  body.veil .godonly{opacity:.3}
-  .caption{grid-column:1/-1;text-align:center;font-size:13.5px;color:#5b6472;margin-top:-6px}
+  .extra{margin-top:12px;border-top:1px solid #eeeff1;padding-top:9px}
+  .extra summary{cursor:pointer;font-weight:700;font-size:13.5px;color:#1d4ed8}
+  .bottom{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .bottom .small{min-height:40px}
+  .caption{text-align:center;font-size:13.5px;color:#5b6472;margin-top:-6px}
   .bh{font-family:'Cambria Math',Cambria,Georgia,serif;font-style:normal}
   @media(max-width:900px){.layout{grid-template-columns:1fr}.bottom{grid-template-columns:1fr}}
   .howto{background:#fff;border:1px solid #e7e8ea;border-left:4px solid #2563eb;border-radius:12px;padding:10px 18px;margin:-4px 0 18px;box-shadow:0 1px 2px rgba(16,24,40,.05)}
@@ -72,75 +83,102 @@
 <header>
   <nav><a href="index.html">← All simulations</a></nav>
   <div class="kicker">Econometrics · Recap · Simulation 5</div>
-  <h1>Hypothesis testing: t-statistics, p-values and power</h1>
-  <p class="sub">We test <strong>H₀: β = 0</strong> (schooling has no effect on wages) with <strong>t = <span class="bh">β&#770;</span> / SE</strong>, and reject H₀ when |t| is larger than the critical value (≈ 1.96).
-  Here <em>you</em> choose the true β, so you always know whether a "significant" result is a real discovery or a false positive.</p>
+  <h1>Hypothesis testing: from one t-statistic to a p-value</h1>
+  <p class="sub">We test <strong>H₀: β = 0</strong> (schooling has no effect on wages) in three steps. <strong>1.</strong> Our one sample gives one t = <span class="bh">β&#770;</span> / SE.
+  <strong>2.</strong> Imagine H₀ is true and draw many samples: how is t spread? <strong>3.</strong> The p-value is the share of those t's at least as far from 0 as ours.</p>
   <details class="howto" open>
     <summary>How to use this simulation</summary>
     <ol>
-      <li>Keep <strong>true β = 0</strong>, so H₀ is true. Click <strong>Run 1 study</strong>: a sample of men is drawn, the regression is run, and you see its <span class="bh">β&#770;</span>, SE, t and p-value on the right.</li>
-      <li>Click <strong>Run 1,000</strong>. About 5% of the studies reject H₀. All of them are <strong>false positives</strong>. That is what a 5% significance level means.</li>
-      <li>Move <strong>true β</strong> to 0.046 and run 1,000 again. Now H₀ is false, and the rejection rate is the test's <strong>power</strong>: its chance of detecting the effect. Then try a larger N.</li>
-      <li>Click <strong>Load our Stata result</strong>. Our t = 2.71 is compared with the distribution of t if H₀ were true. The shaded tails are the p-value.</li>
-      <li>After running a study, click <strong>Researcher's view</strong> to hide everything a real researcher cannot see: the population and all the other studies.</li>
+      <li><strong>Step 1.</strong> Click <strong>Draw a sample</strong> (or <strong>Our Stata result</strong>). Like a real researcher, you get one <span class="bh">β&#770;</span>, one SE and one t, marked in orange below.</li>
+      <li><strong>Step 2.</strong> Click <strong>Draw 1,000</strong>. Each sample comes from an imagined world where β = 0. The histogram of their t's is the <strong>sampling distribution of t if H₀ is true</strong>.</li>
+      <li><strong>Step 3.</strong> Click <strong>Compute the p-value</strong>. Red bars: imagined t's at least as far from 0 as ours. Their share is the p-value. The black curve is the theory shortcut (the CLT), which gives almost the same number.</li>
+      <li>Click <strong>Researcher's view</strong>. Step 2 disappears, because in real life we have one sample. The curve stays, and that is why one sample is enough for a test.</li>
+      <li><strong>Extra:</strong> open <em>False positives and power</em> to run many studies in the world you chose. With true β = 0, about 5% reject H₀ (false positives). With β = 0.046, the rejection rate is the power.</li>
     </ol>
     <p class="key"><b>Key idea:</b> the p-value is the probability of a t-statistic at least as extreme as ours <em>if H₀ were true</em>. It is not the probability that H₀ is true.</p>
   </details>
 </header>
 
 <main class="layout">
-  <section class="card">
-    <canvas id="plot"></canvas>
-  </section>
+  <div class="left">
+    <section class="card">
+      <canvas id="plot"></canvas>
+    </section>
+    <section class="bottom">
+      <div class="card">
+        <h2 id="hbTitle"></h2>
+        <p class="small" id="hbNote"></p>
+        <canvas id="histB"></canvas>
+      </div>
+      <div class="card">
+        <h2 id="htTitle"></h2>
+        <p class="small" id="htNote"></p>
+        <canvas id="histT"></canvas>
+      </div>
+    </section>
+    <p class="caption">Same picture twice: dividing each <span class="bh">β&#770;</span> by its own standard error turns the left histogram into the right one. That is all a t-statistic is.</p>
+  </div>
 
   <aside class="card">
     <div class="ctl">
       <label>True β (return to schooling) <span class="val" id="bVal"></span></label>
-      <input type="range" id="beta" min="0" max="0.08" step="0.002" value="0">
+      <input type="range" id="beta" min="0" max="0.08" step="0.002" value="0.046">
     </div>
     <div class="ctl">
       <label>Sample size N <span class="val" id="nVal"></span></label>
       <input type="range" id="n" min="20" max="1000" step="5" value="165">
     </div>
+
+    <div class="step" id="st1">
+      <div class="stephead"><span class="n">1</span><span id="st1Title">Our one sample</span></div>
+      <div class="btnrow">
+        <button class="btn primary" id="bOur">Draw a sample</button>
+        <button class="btn stata" id="bStata">📋 Our Stata result</button>
+      </div>
+      <div class="study s3">
+        <div><b><span class="bh">β&#770;</span></b><span id="ob">–</span></div>
+        <div><b>SE</b><span id="ose">–</span></div>
+        <div class="ourt"><b>t = <span class="bh">β&#770;</span>/SE</b><span id="ot">–</span></div>
+      </div>
+    </div>
+    <div class="step" id="st2">
+      <div class="stephead"><span class="n">2</span>Imagine H₀ is true: many samples</div>
+      <div class="btnrow">
+        <button class="btn" id="bN1">Draw 1</button>
+        <button class="btn primary" id="bN1000">Draw 1,000</button>
+      </div>
+      <div class="small" id="nullInfo" style="margin-bottom:6px"></div>
+    </div>
+    <div class="step" id="st3">
+      <div class="stephead"><span class="n">3</span>The p-value</div>
+      <div class="btnrow"><button class="btn primary" id="bP" style="flex:1">Compute the p-value</button></div>
+      <div class="study">
+        <div class="pv"><b>SIMULATED p</b><span id="pSim">–</span></div>
+        <div><b>THEORY p (Stata)</b><span id="pTh">–</span></div>
+      </div>
+      <span class="badge fail" id="verdict" style="display:none">–</span>
+    </div>
     <div class="btnrow">
-      <button class="btn primary" id="b1">Run 1 study</button>
-      <button class="btn" id="b100">Run 100</button>
-      <button class="btn" id="b1000">Run 1,000</button>
-      <button class="btn" id="bReset">Reset</button>
+      <button class="btn" id="bVeil" style="flex:1" title="Hide what only the simulation knows" disabled>🙈 Researcher's view</button>
+      <button class="btn" id="bStart">↺ Start over</button>
     </div>
-    <button class="btn wide" id="bVeil" disabled>🙈 Researcher's view: hide what only the simulation knows</button>
-    <button class="btn stata wide" id="bStata">📋 Load our Stata result: <span class="bh">β&#770;</span> = 0.046, SE = 0.017</button>
-
-    <div class="row2">
-      <div class="readout"><div class="lbl">STUDIES RUN</div><div class="num" id="count">0</div></div>
-      <div class="readout hot"><div class="lbl">REJECTED H₀</div><div class="num" id="rejRate">–</div></div>
-    </div>
-    <div class="small" id="critNote" style="margin:-2px 0 10px"></div>
-
-    <h2 style="font-size:13.5px;margin-bottom:6px" id="studyTitle">Latest study</h2>
-    <div class="study">
-      <div><b><span class="bh">β&#770;</span></b><span id="lb">–</span></div>
-      <div><b>SE(<span class="bh">β&#770;</span>)</b><span id="lse">–</span></div>
-      <div><b>t = <span class="bh">β&#770;</span> / SE</b><span id="lt">–</span></div>
-      <div><b>p-VALUE</b><span id="lp">–</span></div>
-    </div>
-    <span class="badge fail" id="verdict" style="visibility:hidden">–</span>
     <div class="msg intro" id="msg"></div>
-  </aside>
 
-  <section class="bottom">
-    <div class="card">
-      <h2 id="hbTitle">Distribution of the estimates <span class="bh">β&#770;</span></h2>
-      <p class="small" id="hbNote">One entry per study. Red dashed line: the true β. Grey line: the value under H₀ (β = 0).</p>
-      <canvas id="histB"></canvas>
-    </div>
-    <div class="card">
-      <h2 id="htTitle">Distribution of the t-statistics</h2>
-      <p class="small" id="htNote">Red zones: reject H₀. Black curve: where t lands <em>if H₀ is true</em> (a t distribution, almost exactly normal).</p>
-      <canvas id="histT"></canvas>
-    </div>
-    <p class="caption">Same picture twice: dividing each <span class="bh">β&#770;</span> by its own standard error turns the left histogram into the right one. That is all a t-statistic is.</p>
-  </section>
+    <details class="extra" id="extra">
+      <summary>Extra: false positives and power</summary>
+      <p class="small" style="margin:6px 0">Run many complete studies in the world you chose with the slider. Start with true β = 0: every rejection is then a false positive.</p>
+      <div class="btnrow">
+        <button class="btn" id="b100">Run 100 studies</button>
+        <button class="btn" id="b1000">Run 1,000</button>
+        <button class="btn" id="bReset">Reset</button>
+      </div>
+      <div class="row2">
+        <div class="readout"><div class="lbl">STUDIES RUN</div><div class="num" id="count">0</div></div>
+        <div class="readout hot"><div class="lbl">REJECTED H₀</div><div class="num" id="rejRate">–</div></div>
+      </div>
+      <div class="small" id="critNote"></div>
+    </details>
+  </aside>
 </main>
 </div>
 
@@ -186,37 +224,64 @@ function Phi(z){const t=1/(1+0.2316419*Math.abs(z)),d=0.3989423*Math.exp(-z*z/2)
 // ---------- model: same population as Simulation 4 ----------
 const A=5.31, XM=13, SX=2.9, SG=0.64;
 const STATA={b:0.0457963,se:0.016902,n:165};
-let trueB=0, N=165, df=163, CRIT=tCrit(163,0.05);
+let trueB=0.046, N=165, df=163, CRIT=tCrit(163,0.05);
 const edu=z=>Math.max(0,Math.min(24,XM+SX*z));
 const seTheory=()=>SG/Math.sqrt(N*SX*SX);
-let cloud=[];
-function genCloud(){const r=mulberry32(5);cloud=[];for(let i=0;i<1500;i++){const x=edu(gaussR(r));cloud.push([x,A+trueB*x+SG*gaussR(r)])}}
+// population clouds for the real world (the β you chose) and the imagined world where H0 is true (same people, β = 0)
+let cloudTrue=[], cloudNull=[];
+function genCloud(b){const r=mulberry32(5),c=[];for(let i=0;i<1500;i++){const x=edu(gaussR(r));c.push([x,A+b*x+SG*gaussR(r)])}return c}
+function genClouds(){cloudTrue=genCloud(trueB);cloudNull=genCloud(0)}
 
-let slopes=[], ts=[], lines=[], rejected=0, lastPts=null, lastLine=null, last=null, veil=false;
-function drawSample(){
+// one study: a sample of N men from a world where the return to schooling is b0, then OLS
+function study(b0){
   const xs=new Array(N), ys=new Array(N);let mx=0,my=0;
-  for(let i=0;i<N;i++){const x=edu(gauss());xs[i]=x;ys[i]=A+trueB*x+SG*gauss();mx+=x;my+=ys[i]}
+  for(let i=0;i<N;i++){const x=edu(gauss());xs[i]=x;ys[i]=A+b0*x+SG*gauss();mx+=x;my+=ys[i]}
   mx/=N;my/=N;
   let sxx=0,sxy=0;for(let i=0;i<N;i++){const dx=xs[i]-mx;sxx+=dx*dx;sxy+=dx*(ys[i]-my)}
   const b=sxy/sxx,a=my-b*mx;
   let ssr=0;for(let i=0;i<N;i++){const e=ys[i]-a-b*xs[i];ssr+=e*e}
-  const se=Math.sqrt(ssr/(N-2)/sxx), t=b/se, p=pTwo(t,df);
-  slopes.push(b);ts.push(t);if(Math.abs(t)>CRIT)rejected++;
-  lines.push({a,b});if(lines.length>300)lines.shift();
-  lastPts=[xs,ys];lastLine={a,b};last={b,se,t,p,df,crit:CRIT,stata:false};
+  const se=Math.sqrt(ssr/(N-2)/sxx), t=b/se;
+  return {xs,ys,a,b,se,t,p:pTwo(t,df),df,crit:CRIT,stata:false};
 }
-function loadStata(){
-  const t=STATA.b/STATA.se, d=STATA.n-2;
-  last={b:STATA.b,se:STATA.se,t,p:pTwo(t,d),df:d,crit:tCrit(d,0.05),stata:true};
-  lastPts=null;lastLine=null;
+
+let mode='steps';                          // 'steps': the three steps; 'studies': the extra on false positives and power
+let our=null;                              // step 1: our one sample, or our Stata result
+let nullB=[], nullT=[], nullLines=[];      // step 2: samples from the imagined world where H0 is true
+let showP=false;                           // step 3
+let veil=false;
+let slopes=[], ts=[], lines=[], rejected=0, lastStudy=null;   // extra: many studies in the world you chose
+
+function drawOur(){our=study(trueB);mode='steps'}
+function useStata(){
+  if(N!==STATA.n){N=STATA.n;nEl.value=N;df=N-2;CRIT=tCrit(df,0.05);clearNull();clearStudies()}
+  const t=STATA.b/STATA.se;
+  our={xs:null,ys:null,a:null,b:STATA.b,se:STATA.se,t,p:pTwo(t,df),df,crit:CRIT,stata:true};mode='steps';
 }
+function drawNull(){const s=study(0);nullB.push(s.b);nullT.push(s.t);nullLines.push({a:s.a,b:s.b});if(nullLines.length>300)nullLines.shift()}
+function drawStudy(){const s=study(trueB);slopes.push(s.b);ts.push(s.t);if(Math.abs(s.t)>CRIT)rejected++;
+  lines.push({a:s.a,b:s.b});if(lines.length>300)lines.shift();lastStudy=s}
+function clearNull(){nullB=[];nullT=[];nullLines=[];showP=false}
+function clearStudies(){slopes=[];ts=[];lines=[];rejected=0;lastStudy=null}
+const nExtreme=()=>our?nullT.reduce((c,t)=>c+(Math.abs(t)>=Math.abs(our.t)?1:0),0):0;
 
 // ---------- scatter ----------
 const plot=document.getElementById('plot'), histB=document.getElementById('histB'), histT=document.getElementById('histT');
-const PH=330, HH=250;
+const PH=290, HH=220;
 const X0=0,X1=24,Y0=3.4,Y1=8.4, M={l:52,r:14,t:12,b:40};
+const OUR='#ea8c1f', OURD='#c2570b';
 const sx=(x,w)=>M.l+(x-X0)/(X1-X0)*(w-M.l-M.r);
 const sy=(y,h)=>h-M.b-(y-Y0)/(Y1-Y0)*(h-M.b-M.t);
+function fitLine(g,w,h,a,b){g.beginPath();g.moveTo(sx(X0,w),sy(a+b*X0,h));g.lineTo(sx(X1,w),sy(a+b*X1,h));g.stroke()}
+function dots(g,w,h,pts,col,r){g.fillStyle=col;for(const [x,y] of pts){g.beginPath();g.arc(sx(x,w),sy(y,h),r,0,7);g.fill()}}
+function sampleDots(g,w,h,s,col){g.fillStyle=col;const r=N>400?2:3;for(let i=0;i<s.xs.length;i++){g.beginPath();g.arc(sx(s.xs[i],w),sy(s.ys[i],h),r,0,7);g.fill()}}
+function legend(g,items,lx,ly){
+  g.font='12.5px "Segoe UI",sans-serif';g.textAlign='left';g.textBaseline='middle';
+  for(const it of items){
+    g.strokeStyle=it.col;g.lineWidth=it.dash?2:2.4;g.setLineDash(it.dash?[6,4]:[]);
+    g.beginPath();g.moveTo(lx,ly);g.lineTo(lx+26,ly);g.stroke();g.setLineDash([]);
+    g.fillStyle='#374151';g.fillText(it.text,lx+32,ly);ly+=18;
+  }
+}
 function drawPlot(){
   const {g,w,h}=ctx2d(plot,PH);g.clearRect(0,0,w,h);
   g.font='12px "Segoe UI",sans-serif';g.textAlign='center';g.textBaseline='top';
@@ -227,33 +292,43 @@ function drawPlot(){
   g.fillStyle='#374151';g.font='600 13px "Segoe UI",sans-serif';g.textAlign='center';g.textBaseline='alphabetic';
   g.fillText('Years of education',(M.l+w-M.r)/2,h-6);
   g.save();g.translate(15,(M.t+h-M.b)/2);g.rotate(-Math.PI/2);g.fillText('Log weekly wage',0,0);g.restore();
+  const imagined=mode==='steps'&&nullT.length>0;
   g.save();g.beginPath();g.rect(M.l,M.t,w-M.l-M.r,h-M.t-M.b);g.clip();
   if(!veil){
-    g.fillStyle='rgba(120,126,138,.25)';
-    for(const [x,y] of cloud){g.beginPath();g.arc(sx(x,w),sy(y,h),1.5,0,7);g.fill()}
-    for(const f of lines){g.lineWidth=1.3;g.strokeStyle='rgba(37,99,235,.06)';g.beginPath();g.moveTo(sx(X0,w),sy(f.a+f.b*X0,h));g.lineTo(sx(X1,w),sy(f.a+f.b*X1,h));g.stroke()}
-    g.strokeStyle='#dc2626';g.lineWidth=2;g.setLineDash([7,5]);
-    g.beginPath();g.moveTo(sx(X0,w),sy(A+trueB*X0,h));g.lineTo(sx(X1,w),sy(A+trueB*X1,h));g.stroke();g.setLineDash([]);
+    if(mode==='studies'){
+      dots(g,w,h,cloudTrue,'rgba(120,126,138,.25)',1.5);
+      g.lineWidth=1.3;g.strokeStyle='rgba(37,99,235,.06)';for(const f of lines)fitLine(g,w,h,f.a,f.b);
+      g.strokeStyle='#dc2626';g.lineWidth=2;g.setLineDash([7,5]);fitLine(g,w,h,A,trueB);g.setLineDash([]);
+    }else if(imagined){
+      dots(g,w,h,cloudNull,'rgba(120,126,138,.22)',1.5);
+      g.lineWidth=1.3;g.strokeStyle='rgba(37,99,235,.08)';for(const f of nullLines)fitLine(g,w,h,f.a,f.b);
+      g.strokeStyle='#8a909c';g.lineWidth=2;g.setLineDash([7,5]);fitLine(g,w,h,A,0);g.setLineDash([]);
+    }else{
+      dots(g,w,h,cloudTrue,'rgba(120,126,138,.25)',1.5);
+      g.strokeStyle='#dc2626';g.lineWidth=2;g.setLineDash([7,5]);fitLine(g,w,h,A,trueB);g.setLineDash([]);
+    }
   }
-  if(lastPts){
-    const [xs,ys]=lastPts;g.fillStyle='#2563eb';
-    for(let i=0;i<xs.length;i++){g.beginPath();g.arc(sx(xs[i],w),sy(ys[i],h),N>400?2:3,0,7);g.fill()}
-    g.strokeStyle='rgba(29,78,216,.95)';g.lineWidth=2.6;
-    g.beginPath();g.moveTo(sx(X0,w),sy(lastLine.a+lastLine.b*X0,h));g.lineTo(sx(X1,w),sy(lastLine.a+lastLine.b*X1,h));g.stroke();
+  if(mode==='studies'&&!veil){
+    if(lastStudy){sampleDots(g,w,h,lastStudy,'#2563eb');g.strokeStyle='rgba(29,78,216,.95)';g.lineWidth=2.6;fitLine(g,w,h,lastStudy.a,lastStudy.b)}
+  }else if(our&&our.xs){
+    sampleDots(g,w,h,our,OUR);g.strokeStyle=OURD;g.lineWidth=2.6;fitLine(g,w,h,our.a,our.b);
   }
   g.restore();
-  g.font='12.5px "Segoe UI",sans-serif';g.textAlign='left';g.textBaseline='middle';
-  const lx=M.l+12;let ly=M.t+14;
+  const lx=M.l+12, ly=M.t+14, ourItem=our&&our.xs?{col:OURD,text:'our sample and its OLS line'+(imagined?' (from the real world, β = '+fmt(trueB,3)+')':'')}:null;
   if(veil){
+    g.textAlign='left';g.textBaseline='middle';
     g.fillStyle='#374151';g.font='600 13px "Segoe UI",sans-serif';
-    g.fillText(last&&last.stata?'Our CPS regression: 165 men, one fitted line. That is all we have.':'The researcher\'s whole world: one sample of N = '+N+', one fitted line.',lx,ly);
+    g.fillText(our.stata?'Our CPS regression: 165 men, one fitted line. That is all we have.':'The researcher\'s whole world: one sample of N = '+N+', one fitted line.',lx,ly);
     g.font='12.5px "Segoe UI",sans-serif';g.fillStyle='#6b7280';
-    g.fillText('No population, no true line, no repeated studies. Those exist only in the simulation.',lx,ly+18);
+    g.fillText('No population, no true line, no repeated samples. Those exist only in the simulation.',lx,ly+18);
+  }else if(mode==='studies'){
+    legend(g,[{col:'#dc2626',dash:true,text:'true relationship: you chose β = '+fmt(trueB,3)+(trueB===0?'  (H₀ is TRUE)':'  (H₀ is FALSE)')},
+              {col:'rgba(29,78,216,.95)',text:'OLS line from the latest study'}],lx,ly);
+  }else if(imagined){
+    legend(g,[{col:'#8a909c',dash:true,text:'imagined world where H₀ is true: β = 0'},
+              {col:'rgba(37,99,235,.6)',text:'OLS lines from the imagined samples'},ourItem].filter(Boolean),lx,ly);
   }else{
-    g.strokeStyle='#dc2626';g.setLineDash([6,4]);g.lineWidth=2;g.beginPath();g.moveTo(lx,ly);g.lineTo(lx+26,ly);g.stroke();g.setLineDash([]);
-    g.fillStyle='#374151';g.fillText('true relationship: you chose β = '+fmt(trueB,3)+(trueB===0?'  (H₀ is TRUE)':'  (H₀ is FALSE)'),lx+32,ly);
-    ly+=18;g.strokeStyle='rgba(29,78,216,.95)';g.lineWidth=2.4;g.beginPath();g.moveTo(lx,ly);g.lineTo(lx+26,ly);g.stroke();
-    g.fillText('OLS line from the latest study',lx+32,ly);
+    legend(g,[{col:'#dc2626',dash:true,text:'true relationship: you chose β = '+fmt(trueB,3)+(trueB===0?'  (H₀ is TRUE)':'  (H₀ is FALSE)')},ourItem].filter(Boolean),lx,ly);
   }
 }
 
@@ -270,30 +345,40 @@ function frame(g,w,h,lo,hi,ticks,dec,label){
 }
 function vline(g,x,top,bot,col,dash){g.strokeStyle=col;g.lineWidth=dash?1.6:2.6;if(dash)g.setLineDash([6,4]);g.beginPath();g.moveTo(x,top);g.lineTo(x,bot);g.stroke();g.setLineDash([])}
 function arrow(g,x,base,txt,leftSide){
-  g.strokeStyle='#ea8c1f';g.lineWidth=2.6;g.beginPath();g.moveTo(x,base);g.lineTo(x,base-32);g.stroke();
-  g.fillStyle='#ea8c1f';g.beginPath();g.moveTo(x,base-32);g.lineTo(x-5,base-42);g.lineTo(x+5,base-42);g.closePath();g.fill();
+  g.strokeStyle=OUR;g.lineWidth=2.6;g.beginPath();g.moveTo(x,base);g.lineTo(x,base-32);g.stroke();
+  g.fillStyle=OUR;g.beginPath();g.moveTo(x,base-32);g.lineTo(x-5,base-42);g.lineTo(x+5,base-42);g.closePath();g.fill();
   g.font='700 12.5px "Segoe UI",sans-serif';g.textAlign=leftSide?'right':'left';g.textBaseline='middle';
-  g.fillStyle='#c2570b';fillHat(g,txt,x+(leftSide?-8:8),base-37);
+  const tw=g.measureText(txt).width+6, tx=x+(leftSide?-8:8);
+  g.fillStyle='rgba(255,255,255,.85)';g.fillRect(leftSide?tx-tw+3:tx-3,base-46,tw,18);
+  g.fillStyle=OURD;fillHat(g,txt,tx,base-37);
 }
 function ticksFor(lo,hi,n){const out=[];for(let i=0;i<=n;i++)out.push(lo+(hi-lo)*i/n);return out}
-
-function tRange(){
-  const c=trueB/seTheory();
-  let lo=Math.min(-5,c-4), hi=Math.max(5,c+4);
-  if(veil&&last){lo=Math.min(lo,-Math.abs(last.t)-1.5);hi=Math.max(hi,Math.abs(last.t)+1.5)}
-  return {lo,hi};
+function tTicks(lo,hi){const step=hi-lo>14?4:2, out=[];for(let v=Math.ceil(lo/step)*step;v<=hi;v+=step)out.push(v);return out}
+function placeholder(g,w,h,txt){const cx=(HM.l+w-HM.r)/2, cy=(HM.t+h-HM.b)/2-14;g.font='italic 13px "Segoe UI",sans-serif';
+  const tw=g.measureText(txt).width+10;g.fillStyle='#fff';g.fillRect(cx-tw/2,cy-10,tw,20);
+  g.fillStyle='#9aa0aa';g.textAlign='center';g.textBaseline='middle';g.fillText(txt,cx,cy)}
+// histogram of the imagined samples; after step 3, the samples with |t| at least our |t| are counted separately (red)
+function nullBins(vals,lo,hi,NB){
+  const bw=(hi-lo)/NB, all=new Array(NB).fill(0), ext=new Array(NB).fill(0), at=our?Math.abs(our.t):Infinity;
+  vals.forEach((v,i)=>{const k=Math.floor((v-lo)/bw);if(k<0||k>=NB)return;all[k]++;if(showP&&Math.abs(nullT[i])>=at)ext[k]++});
+  return {bw,all,ext};
 }
-function bRange(){
-  const s=veil&&last?last.se:seTheory(), tb=veil&&last?Math.abs(last.b):trueB;
-  return {lo:Math.min(0,-tb)-4.5*s, hi:Math.max(0,tb)+4.5*s};
+function bars(g,h,bx,by,lo,bw,all,ext){
+  for(let k=0;k<all.length;k++){if(!all[k])continue;const x=bx(lo+k*bw),wd=Math.max(1,bx(lo+(k+1)*bw)-x-1);
+    g.fillStyle='rgba(37,99,235,.55)';g.fillRect(x+0.5,by(all[k]),wd,h-HM.b-by(all[k]));
+    if(ext[k]){g.fillStyle='rgba(220,38,38,.85)';g.fillRect(x+0.5,by(ext[k]),wd,h-HM.b-by(ext[k]))}}
+}
+function stepRanges(){
+  const s=seTheory(), at=our?Math.abs(our.t):0, ab=our?Math.abs(our.b):0, T=Math.max(5,at+1.2), B=Math.max(4.5*s,ab+s);
+  return {tlo:-T,thi:T,blo:-B,bhi:B};
 }
 
+// ---------- left panel: β̂ ----------
 function drawHistB(){
   const {g,w,h}=ctx2d(histB,HH);g.clearRect(0,0,w,h);
-  const {lo,hi}=bRange();
-  const bx=frame(g,w,h,lo,hi,ticksFor(lo,hi,5),3,veil?'β̂: where would it land if the truth were β = 0?':'estimated return to schooling β̂');
-  if(veil&&last){
-    const s=last.se, ab=Math.abs(last.b), den=v=>tpdf(v/s,last.df)/s;
+  if(veil&&our){   // theory only: under H0, β̂ is centred at 0 with spread SE
+    const s=our.se, ab=Math.abs(our.b), lo=-ab-4.5*s, hi=ab+4.5*s, den=v=>tpdf(v/s,our.df)/s;
+    const bx=frame(g,w,h,lo,hi,ticksFor(lo,hi,4),3,'β̂: where would it land if the truth were β = 0?');
     const by=d=>h-HM.b-d/den(0)*(h-HM.t-HM.b)*0.85;
     const tail=(a,c)=>{g.beginPath();g.moveTo(bx(a),h-HM.b);for(let i=0;i<=60;i++){const v=a+(c-a)*i/60;g.lineTo(bx(v),by(den(v)))}g.lineTo(bx(c),h-HM.b);g.closePath();g.fillStyle='rgba(220,38,38,.28)';g.fill()};
     tail(lo,-ab);tail(ab,hi);
@@ -301,122 +386,197 @@ function drawHistB(){
     for(let i=0;i<=260;i++){const v=lo+(hi-lo)*i/260;if(i===0)g.moveTo(bx(v),by(den(v)));else g.lineTo(bx(v),by(den(v)))}g.stroke();
     vline(g,bx(0),HM.t+14,h-HM.b,'#8a909c',true);
     g.fillStyle='#5b6472';g.font='600 12px "Segoe UI",sans-serif';g.textAlign='center';g.textBaseline='top';g.fillText('H₀: β = 0',bx(0),HM.t-2);
-    arrow(g,bx(Math.min(hi,last.b)),h-HM.b,'our β̂ = '+fmt(last.b,3),last.b>(lo+hi)/2);
-    g.fillStyle='#b91c1c';g.font='600 12.5px "Segoe UI",sans-serif';g.textAlign='left';g.textBaseline='top';
-    g.fillText('curve centred at 0 with width SE = '+fmt(last.se,3)+': from ONE sample',HM.l+4,HM.t-16);
+    arrow(g,bx(our.b),h-HM.b,'our β̂ = '+fmt(our.b,3),our.b>0);
     return;
   }
-  const NB=46,bw=(hi-lo)/NB,bins=new Array(NB).fill(0);
-  for(const b of slopes){const k=Math.floor((b-lo)/bw);if(k>=0&&k<NB)bins[k]++}
-  const maxC=Math.max(1,...bins), by=c=>h-HM.b-c/maxC*(h-HM.t-HM.b);
-  for(let k=0;k<NB;k++){if(!bins[k])continue;const x=bx(lo+k*bw),x2=bx(lo+(k+1)*bw),y=by(bins[k]);
-    const mid=lo+(k+0.5)*bw, rej=Math.abs(mid/seTheory())>CRIT;
-    g.fillStyle=rej?'rgba(220,38,38,.62)':'rgba(37,99,235,.62)';g.fillRect(x+0.5,y,Math.max(1,x2-x-1),h-HM.b-y)}
+  if(mode==='studies'){
+    const s=seTheory(), lo=Math.min(0,-trueB)-4.5*s, hi=Math.max(0,trueB)+4.5*s;
+    const bx=frame(g,w,h,lo,hi,ticksFor(lo,hi,4),3,'estimated return to schooling β̂');
+    const NB=46,bw=(hi-lo)/NB,bins=new Array(NB).fill(0);
+    for(const b of slopes){const k=Math.floor((b-lo)/bw);if(k>=0&&k<NB)bins[k]++}
+    const maxC=Math.max(1,...bins), by=c=>h-HM.b-c/maxC*(h-HM.t-HM.b);
+    for(let k=0;k<NB;k++){if(!bins[k])continue;const x=bx(lo+k*bw),x2=bx(lo+(k+1)*bw),y=by(bins[k]);
+      const mid=lo+(k+0.5)*bw, rej=Math.abs(mid/s)>CRIT;
+      g.fillStyle=rej?'rgba(220,38,38,.62)':'rgba(37,99,235,.62)';g.fillRect(x+0.5,y,Math.max(1,x2-x-1),h-HM.b-y)}
+    vline(g,bx(0),HM.t,h-HM.b,'#8a909c',true);
+    g.fillStyle='#5b6472';g.font='600 12px "Segoe UI",sans-serif';g.textAlign='right';g.textBaseline='top';g.fillText('H₀: β = 0 ',bx(0)-2,HM.t-14);
+    if(trueB!==0){vline(g,bx(trueB),HM.t,h-HM.b,'#dc2626',true);g.fillStyle='#dc2626';g.textAlign='left';g.fillText(' true β = '+fmt(trueB,3),bx(trueB)+2,HM.t-14)}
+    return;
+  }
+  const r=stepRanges(), lo=r.blo, hi=r.bhi;
+  const bx=frame(g,w,h,lo,hi,ticksFor(lo,hi,4),3,'estimated return to schooling β̂');
+  if(nullB.length){
+    const NB=46,{bw,all,ext}=nullBins(nullB,lo,hi,NB), maxC=Math.max(1,...all), by=c=>h-HM.b-c/maxC*(h-HM.t-HM.b)*0.9;
+    bars(g,h,bx,by,lo,bw,all,ext);
+  }else placeholder(g,w,h,'Step 2 fills this in');
   vline(g,bx(0),HM.t,h-HM.b,'#8a909c',true);
   g.fillStyle='#5b6472';g.font='600 12px "Segoe UI",sans-serif';g.textAlign='right';g.textBaseline='top';g.fillText('H₀: β = 0 ',bx(0)-2,HM.t-14);
-  if(trueB!==0){vline(g,bx(trueB),HM.t,h-HM.b,'#dc2626',true);g.fillStyle='#dc2626';g.textAlign='left';g.fillText(' true β = '+fmt(trueB,3),bx(trueB)+2,HM.t-14)}
+  if(our)arrow(g,bx(our.b),h-HM.b,'our β̂ = '+fmt(our.b,3),our.b>0);
 }
 
+// ---------- right panel: t ----------
 function drawHistT(){
   const {g,w,h}=ctx2d(histT,HH);g.clearRect(0,0,w,h);
-  const {lo,hi}=tRange(), crit=veil&&last?last.crit:CRIT, d=veil&&last?last.df:df;
-  const step=hi-lo>14?4:2, ticks=[];for(let v=Math.ceil(lo/step)*step;v<=hi;v+=step)ticks.push(v);
-  const bx=frame(g,w,h,lo,hi,ticks,0,veil?'t-statistic: the known shape under H₀':'t-statistic');
-  g.fillStyle='rgba(220,38,38,.07)';
-  g.fillRect(HM.l,HM.t,Math.max(0,bx(-crit)-HM.l),h-HM.t-HM.b);g.fillRect(bx(crit),HM.t,Math.max(0,w-HM.r-bx(crit)),h-HM.t-HM.b);
-  for(const c of [-crit,crit])vline(g,bx(c),HM.t,h-HM.b,'#dc2626',true);
-  g.fillStyle='#b91c1c';g.font='600 11.5px "Segoe UI",sans-serif';g.textAlign='center';g.textBaseline='bottom';
-  g.fillText('−'+fmt(crit,2),bx(-crit),HM.t-2);g.fillText(fmt(crit,2),bx(crit),HM.t-2);
-  if(veil&&last){
-    const by=v=>h-HM.b-v/tpdf(0,d)*(h-HM.t-HM.b)*0.85, at=Math.abs(last.t);
+  const zones=(bx,crit)=>{
+    g.fillStyle='rgba(220,38,38,.07)';
+    g.fillRect(HM.l,HM.t,Math.max(0,bx(-crit)-HM.l),h-HM.t-HM.b);g.fillRect(bx(crit),HM.t,Math.max(0,w-HM.r-bx(crit)),h-HM.t-HM.b);
+    for(const c of [-crit,crit])vline(g,bx(c),HM.t,h-HM.b,'#dc2626',true);
+    g.fillStyle='#b91c1c';g.font='600 11.5px "Segoe UI",sans-serif';g.textAlign='center';g.textBaseline='bottom';
+    g.fillText('−'+fmt(crit,2),bx(-crit),HM.t-2);g.fillText(fmt(crit,2),bx(crit),HM.t-2);
+  };
+  const curveLine=(bx,f,lo,hi)=>{g.strokeStyle='#1c2330';g.lineWidth=2;g.beginPath();
+    for(let i=0;i<=280;i++){const v=lo+(hi-lo)*i/280;if(i===0)g.moveTo(bx(v),f(v));else g.lineTo(bx(v),f(v))}g.stroke()};
+  if(veil&&our){   // theory only: the t distribution under H0, our t and the p-value as shaded tails
+    const at=Math.abs(our.t), lo=Math.min(-5,-at-1.5), hi=Math.max(5,at+1.5), d=our.df;
+    const bx=frame(g,w,h,lo,hi,tTicks(lo,hi),0,'t-statistic: the known shape under H₀');
+    zones(bx,our.crit);
+    const by=v=>h-HM.b-v/tpdf(0,d)*(h-HM.t-HM.b)*0.85;
     const tail=(a,c)=>{g.beginPath();g.moveTo(bx(a),h-HM.b);for(let i=0;i<=60;i++){const v=a+(c-a)*i/60;g.lineTo(bx(v),by(tpdf(v,d)))}g.lineTo(bx(c),h-HM.b);g.closePath();g.fillStyle='rgba(220,38,38,.3)';g.fill()};
     tail(lo,-at);tail(at,hi);
-    g.strokeStyle='#1c2330';g.lineWidth=2;g.beginPath();
-    for(let i=0;i<=280;i++){const v=lo+(hi-lo)*i/280;if(i===0)g.moveTo(bx(v),by(tpdf(v,d)));else g.lineTo(bx(v),by(tpdf(v,d)))}g.stroke();
-    arrow(g,bx(last.t),h-HM.b,'our t = '+fmt(last.t,2),last.t>(lo+hi)/2);
+    curveLine(bx,v=>by(tpdf(v,d)),lo,hi);
+    arrow(g,bx(our.t),h-HM.b,'our t = '+fmt(our.t,2),our.t>0);
     g.fillStyle='#b91c1c';g.font='600 12.5px "Segoe UI",sans-serif';g.textAlign='left';g.textBaseline='top';
-    g.fillText('shaded area = p-value = '+(last.p<0.001?'< 0.001':fmt(last.p,3)),HM.l+4,HM.t+4);
+    g.fillText('shaded area = p-value = '+(our.p<0.001?'< 0.001':fmt(our.p,3)),HM.l+4,HM.t+4);
     return;
   }
-  const NB=70,bw=(hi-lo)/NB,bins=new Array(NB).fill(0);
-  for(const t of ts){const k=Math.floor((t-lo)/bw);if(k>=0&&k<NB)bins[k]++}
-  const curve=v=>ts.length*bw*tpdf(v,d);
-  const maxC=Math.max(1,...bins,ts.length?curve(0):0), by=c=>h-HM.b-c/maxC*(h-HM.t-HM.b);
-  for(let k=0;k<NB;k++){if(!bins[k])continue;const x=bx(lo+k*bw),x2=bx(lo+(k+1)*bw),mid=lo+(k+0.5)*bw;
-    g.fillStyle=Math.abs(mid)>crit?'rgba(220,38,38,.66)':'rgba(37,99,235,.62)';g.fillRect(x+0.5,by(bins[k]),Math.max(1,x2-x-1),h-HM.b-by(bins[k]))}
-  if(ts.length){g.strokeStyle='#1c2330';g.lineWidth=2;g.beginPath();
-    for(let i=0;i<=280;i++){const v=lo+(hi-lo)*i/280;if(i===0)g.moveTo(bx(v),by(curve(v)));else g.lineTo(bx(v),by(curve(v)))}g.stroke()}
+  if(mode==='studies'){
+    const c=trueB/seTheory(), lo=Math.min(-5,c-4), hi=Math.max(5,c+4);
+    const bx=frame(g,w,h,lo,hi,tTicks(lo,hi),0,'t-statistic');
+    zones(bx,CRIT);
+    const NB=70,bw=(hi-lo)/NB,bins=new Array(NB).fill(0);
+    for(const t of ts){const k=Math.floor((t-lo)/bw);if(k>=0&&k<NB)bins[k]++}
+    const curve=v=>ts.length*bw*tpdf(v,df);
+    const maxC=Math.max(1,...bins,ts.length?curve(0):0), by=c=>h-HM.b-c/maxC*(h-HM.t-HM.b);
+    for(let k=0;k<NB;k++){if(!bins[k])continue;const x=bx(lo+k*bw),x2=bx(lo+(k+1)*bw),mid=lo+(k+0.5)*bw;
+      g.fillStyle=Math.abs(mid)>CRIT?'rgba(220,38,38,.66)':'rgba(37,99,235,.62)';g.fillRect(x+0.5,by(bins[k]),Math.max(1,x2-x-1),h-HM.b-by(bins[k]))}
+    if(ts.length)curveLine(bx,v=>by(curve(v)),lo,hi);
+    return;
+  }
+  const r=stepRanges(), lo=r.tlo, hi=r.thi;
+  const bx=frame(g,w,h,lo,hi,tTicks(lo,hi),0,'t-statistic');
+  if(nullT.length){
+    const NB=60,{bw,all,ext}=nullBins(nullT,lo,hi,NB), curve=v=>nullT.length*bw*tpdf(v,df);
+    const maxC=Math.max(1,...all,showP?curve(0):0), by=c=>h-HM.b-c/maxC*(h-HM.t-HM.b)*0.9;
+    if(showP&&our){const at=Math.abs(our.t);g.fillStyle='rgba(220,38,38,.08)';
+      g.fillRect(HM.l,HM.t,Math.max(0,bx(-at)-HM.l),h-HM.t-HM.b);g.fillRect(bx(at),HM.t,Math.max(0,w-HM.r-bx(at)),h-HM.t-HM.b)}
+    bars(g,h,bx,by,lo,bw,all,ext);
+    if(showP&&our){
+      curveLine(bx,v=>by(curve(v)),lo,hi);
+      vline(g,bx(-our.t),HM.t+24,h-HM.b,OUR,true);
+      const k=nExtreme();
+      g.fillStyle='#b91c1c';g.font='600 12.5px "Segoe UI",sans-serif';g.textAlign='left';g.textBaseline='top';
+      g.fillText('red: |t| ≥ '+fmt(Math.abs(our.t),2)+'  →  '+k.toLocaleString()+' of '+nullT.length.toLocaleString(),HM.l+4,HM.t-12);
+    }
+  }else placeholder(g,w,h,'Step 2 fills this in');
+  if(our)arrow(g,bx(our.t),h-HM.b,'our t = '+fmt(our.t,2),our.t>0);
 }
 
-// ---------- readouts ----------
-function updateReadouts(){
-  document.getElementById('bVal').textContent=fmt(trueB,3)+(trueB===0?'  (H₀ true)':'');
-  document.getElementById('nVal').textContent=N;
-  document.getElementById('count').textContent=ts.length.toLocaleString();
-  document.getElementById('rejRate').textContent=ts.length?fmt(100*rejected/ts.length,1)+'%':'–';
-  const s=seTheory(), delta=trueB/s, powerTh=trueB===0?0.05:1-Phi(CRIT-delta)+Phi(-CRIT-delta);
-  document.getElementById('critNote').innerHTML='Reject when |t| &gt; '+fmt(CRIT,3)+' (t distribution, '+df+' df; ≈ 1.96). '+
-    (trueB===0?'Expected rejection rate: <strong>5%</strong> (all false positives).':'Expected rejection rate (power): <strong>≈ '+fmt(100*powerTh,0)+'%</strong>.');
-  const bV=document.getElementById('bVeil');bV.disabled=!last;
-  bV.classList.toggle('dark',veil);
-  bV.textContent=veil?'👁 Simulation view: show everything again':'🙈 Researcher\'s view: hide what only the simulation knows';
-  document.getElementById('studyTitle').textContent=last&&last.stata?'Our CPS study (reg log_w_wage year_ed)':'Latest study';
-  const v=document.getElementById('verdict');
-  if(last){
-    document.getElementById('lb').textContent=fmt(last.b,4);
-    document.getElementById('lse').textContent=fmt(last.se,4);
-    document.getElementById('lt').textContent=fmt(last.t,2);
-    document.getElementById('lp').textContent=last.p<0.001?'< 0.001':fmt(last.p,3);
-    v.style.visibility='visible';
-    if(Math.abs(last.t)>last.crit){v.className='badge rej';v.textContent='Reject H₀: "statistically significant"'}
-    else{v.className='badge fail';v.textContent='Fail to reject H₀'}
-  }else{['lb','lse','lt','lp'].forEach(id=>document.getElementById(id).textContent='–');v.style.visibility='hidden'}
-  const msg=document.getElementById('msg');
-  if(veil&&last&&last.stata){msg.className='msg null';
-    msg.innerHTML='<strong>Our regression from the slides.</strong> t = 0.046 / 0.017 = '+fmt(last.t,2)+'. <em>If the true return to schooling were zero</em>, a t-statistic at least this far from zero would turn up in only '+fmt(100*last.p,1)+'% of samples (the shaded tails). That is the p-value. It is below 5% (and 1%), so we reject H₀. It is <strong>not</strong> the probability that H₀ is true.'}
-  else if(veil&&last){msg.className='msg null';
-    msg.innerHTML='<strong>Researcher\'s view.</strong> One sample, one <span class="bh">β&#770;</span>, one SE. The histograms are gone, because in real life they never existed. But theory gives us the <em>shape</em> of t under H₀, so we can still ask: <em>if β were 0, how often would a t this extreme appear?</em> Answer: p = '+(last.p<0.001?'&lt; 0.001':fmt(last.p,3))+'.'}
-  else if(!ts.length){msg.className='msg intro';
-    msg.innerHTML='Click <strong>Run 1 study</strong>: draw a sample of '+N+' men, run the regression, compute t = <span class="bh">β&#770;</span>/SE, and decide. Then run 1,000.'}
-  else if(trueB===0){msg.className='msg null';
-    msg.innerHTML='<strong>Here H₀ is TRUE</strong> (β = 0): schooling does nothing. So every rejection is a <strong>false positive</strong>. Over many studies the rate settles at about <strong>5%</strong>: that is what "significance level 5%" means. Now move β away from zero.'}
-  else{msg.className='msg alt';
-    msg.innerHTML='<strong>Here H₀ is FALSE</strong> (β = '+fmt(trueB,3)+'). The rejection rate is now the test\'s <strong>power</strong>: its chance of detecting a real effect. Small effect or small N means low power. At β = 0.046 and N = 165 we find the effect only about '+fmt(100*(1-Phi(tCrit(163,.05)-0.046/(SG/Math.sqrt(165*SX*SX)))),0)+'% of the time.'}
+// ---------- titles, readouts and messages ----------
+function setTitles(){
+  const T=(id,html)=>document.getElementById(id).innerHTML=html;
+  if(veil){
+    T('hbTitle','Where <span class="bh">β&#770;</span> would land if H₀ were true');
+    T('htTitle','The t distribution under H₀ and our t');
+    T('hbNote','Theory, not simulation: under H₀, <span class="bh">β&#770;</span> is centred at 0 with spread SE.');
+    T('htNote','The p-value is the shaded area: the share of the curve at least as far out as our t.');
+  }else if(mode==='studies'){
+    T('hbTitle','Distribution of the estimates <span class="bh">β&#770;</span>');
+    T('htTitle','Distribution of the t-statistics');
+    T('hbNote','One entry per study in the world you chose. Red bars: studies that reject H₀.');
+    T('htNote','Red zones: reject H₀. Black curve: where t lands <em>if H₀ is true</em>.');
+  }else{
+    T('hbTitle','<span class="bh">β&#770;</span> if H₀ were true');
+    T('htTitle','t if H₀ were true: the sampling distribution');
+    T('hbNote',nullB.length?'One entry per imagined sample where β really is 0. Orange: our <span class="bh">β&#770;</span>.':'Empty until step 2. Orange: our <span class="bh">β&#770;</span>.');
+    T('htNote',showP?'Red bars: imagined t\'s at least as far from 0 as ours. Their share is the p-value. Black curve: the theory (CLT) shortcut.':
+      nullT.length?'One entry per imagined sample where H₀ is true. Orange: our t.':'Empty until step 2. Orange: our t.');
+  }
 }
-function drawAll(){drawPlot();drawHistB();drawHistT();updateReadouts()}
+function updateReadouts(){
+  const $=id=>document.getElementById(id);
+  $('bVal').textContent=fmt(trueB,3)+(trueB===0?'  (H₀ true)':'');
+  $('nVal').textContent=N;
+  // the three steps
+  const cur=!our?1:!nullT.length?2:3;
+  [1,2,3].forEach(i=>{const el=$('st'+i);el.classList.toggle('cur',mode==='steps'&&!veil&&i===cur&&!(i===3&&showP));el.classList.toggle('off',i>cur)});
+  $('st1Title').textContent=our&&our.stata?'Our one sample: the Stata result':'Our one sample';
+  $('ob').textContent=our?fmt(our.b,4):'–';
+  $('ose').textContent=our?fmt(our.se,4):'–';
+  $('ot').textContent=our?fmt(our.t,2):'–';
+  $('bN1').disabled=$('bN1000').disabled=!our;
+  $('nullInfo').textContent='World with β = 0 · '+nullT.length.toLocaleString()+' imagined samples of N = '+N;
+  $('bP').disabled=!(our&&nullT.length);
+  const k=nExtreme(), M=nullT.length, v=$('verdict');
+  if(showP&&our&&M){
+    $('pSim').textContent=k?k.toLocaleString()+' / '+M.toLocaleString()+' = '+fmt(k/M,3):'0 / '+M.toLocaleString()+' → < '+fmt(1/M,3);
+    $('pTh').textContent=our.p<0.001?'< 0.001':fmt(our.p,3);
+    v.style.display='inline-block';
+    if(our.p<0.05){v.className='badge rej';v.textContent='p < 0.05: reject H₀'}else{v.className='badge fail';v.textContent='p ≥ 0.05: fail to reject H₀'}
+  }else{$('pSim').textContent='–';$('pTh').textContent='–';v.style.display='none'}
+  const bV=$('bVeil');bV.disabled=!our;bV.classList.toggle('dark',veil);
+  bV.textContent=veil?'👁 Simulation view':'🙈 Researcher\'s view';
+  // extra: false positives and power
+  if(mode==='studies')$('extra').open=true;
+  $('count').textContent=ts.length.toLocaleString();
+  $('rejRate').textContent=ts.length?fmt(100*rejected/ts.length,1)+'%':'–';
+  const s=seTheory(), delta=trueB/s, powerTh=trueB===0?0.05:1-Phi(CRIT-delta)+Phi(-CRIT-delta);
+  $('critNote').innerHTML='Reject when |t| &gt; '+fmt(CRIT,3)+' (t distribution, '+df+' df; ≈ 1.96). '+
+    (trueB===0?'Expected rejection rate: <strong>5%</strong> (all false positives).':'Expected rejection rate (power): <strong>≈ '+fmt(100*powerTh,0)+'%</strong>.');
+  // message
+  const msg=$('msg'), pTxt=p=>p<0.001?'&lt; 0.001':fmt(p,3);
+  const set=(cls,html)=>{msg.className='msg '+cls;msg.innerHTML=html};
+  if(veil&&our&&our.stata)
+    set('null','<strong>Our regression from the slides.</strong> t = 0.046 / 0.017 = '+fmt(our.t,2)+'. <em>If the true return to schooling were zero</em>, a t-statistic at least this far from zero would turn up in only '+fmt(100*our.p,1)+'% of samples (the shaded tails). That is the p-value. It is below 5% (and 1%), so we reject H₀. It is <strong>not</strong> the probability that H₀ is true.');
+  else if(veil&&our)
+    set('null','<strong>Researcher\'s view.</strong> One sample, one <span class="bh">β&#770;</span>, one SE. The histograms are gone: in real life we cannot draw 1,000 samples. But theory (the CLT) gives the <em>shape</em> of t under H₀, so we can still ask: <em>if β were 0, how often would a t this extreme appear?</em> Answer: p = '+pTxt(our.p)+'.');
+  else if(mode==='studies'&&trueB===0)
+    set('null','<strong>Here H₀ is TRUE</strong> (β = 0): schooling does nothing. So every rejection is a <strong>false positive</strong>. Over many studies the rate settles at about <strong>5%</strong>: that is what "significance level 5%" means. Now move β away from zero.');
+  else if(mode==='studies')
+    set('alt','<strong>Here H₀ is FALSE</strong> (β = '+fmt(trueB,3)+'). The rejection rate is now the test\'s <strong>power</strong>: its chance of detecting a real effect. Small effect or small N means low power. At β = 0.046 and N = 165 we find the effect only about '+fmt(100*(1-Phi(tCrit(163,.05)-0.046/(SG/Math.sqrt(165*SX*SX)))),0)+'% of the time.');
+  else if(!our)
+    set('intro','<strong>Step 1.</strong> A real researcher has <strong>one</strong> sample. Draw one: '+N+' men, one regression, one <span class="bh">β&#770;</span>, one SE, and one t = <span class="bh">β&#770;</span> / SE. Or use our Stata result.');
+  else if(!M)
+    set('intro','<strong>Our t = '+fmt(our.t,2)+'.</strong> Is that large? On its own we cannot tell: we need to know what t looks like when there is no effect. <strong>Step 2:</strong> imagine a world where H₀ is true (β = 0) and draw many samples from it.');
+  else if(!showP)
+    set('intro','<strong>The sampling distribution of t if H₀ is true.</strong> Each bar counts t\'s from imagined samples where schooling does nothing. '+(M<50?'Keep drawing: the shape appears as the samples pile up.':'They pile up around 0, mostly between −2 and 2. Where does our t (orange) fall? <strong>Step 3.</strong>'));
+  else
+    set('null','<strong>p-value</strong> = share of imagined samples with a t at least as far from 0 as ours: '+(k?k.toLocaleString()+' of '+M.toLocaleString()+', so p ≈ '+fmt(k/M,3):'none of '+M.toLocaleString()+', so p &lt; '+fmt(1/M,3)+'. Draw more samples, or use the curve')+'. The black curve is the theory shortcut (the CLT): it gives p = '+pTxt(our.p)+' without simulating anything, and that is the number Stata reports. '+
+      (our.p<0.05?'p &lt; 0.05, so we reject H₀.':'p ≥ 0.05, so we do not reject H₀.')+' The p-value is <strong>not</strong> the probability that H₀ is true.');
+}
+function drawAll(){setTitles();drawPlot();drawHistB();drawHistT();updateReadouts()}
 
 // ---------- controls ----------
 let running=false;
-function runBatch(k){
+function animate(k,fn){
   if(running)return;running=true;let done=0;
-  if(veil)setVeil(false,true);
-  (function step(){const m=Math.min(k>200?40:10,k-done);for(let i=0;i<m;i++)drawSample();done+=m;drawAll();
+  (function step(){const m=Math.min(k>200?40:10,k-done);for(let i=0;i<m;i++)fn();done+=m;drawAll();
     if(done<k)requestAnimationFrame(step);else running=false})();
 }
-function setVeil(v,quiet){if(v&&!last)return;veil=v;document.body.classList.toggle('veil',veil);
-  document.getElementById('hbTitle').innerHTML=veil?'Where <span class="bh">β&#770;</span> would land if H₀ were true':'Distribution of the estimates <span class="bh">β&#770;</span>';
-  document.getElementById('htTitle').textContent=veil?'The t distribution under H₀ and our t':'Distribution of the t-statistics';
-  document.getElementById('hbNote').innerHTML=veil?'Theory, not simulation: under H₀, <span class="bh">β&#770;</span> is centred at 0 with spread SE.':'One entry per study. Grey line: the value under H₀ (β = 0). Red bars: studies that reject H₀.';
-  document.getElementById('htNote').innerHTML=veil?'The p-value is the shaded area: the share of the curve at least as far out as our t.':'Red zones: reject H₀. Black curve: where t lands <em>if H₀ is true</em> (a t distribution, almost exactly normal).';
-  if(!quiet)drawAll()}
-function resetAll(){slopes=[];ts=[];lines=[];rejected=0;lastPts=null;lastLine=null;last=null;if(veil)setVeil(false,true);drawAll()}
-document.getElementById('b1').addEventListener('click',()=>{if(running)return;if(last&&last.stata)setVeil(false,true);drawSample();drawAll()});
-document.getElementById('b100').addEventListener('click',()=>runBatch(100));
-document.getElementById('b1000').addEventListener('click',()=>runBatch(1000));
-document.getElementById('bReset').addEventListener('click',()=>{if(!running)resetAll()});
-document.getElementById('bVeil').addEventListener('click',()=>{if(!running)setVeil(!veil)});
-document.getElementById('bStata').addEventListener('click',()=>{if(running)return;loadStata();setVeil(true)});
+function setVeil(v,quiet){if(v&&!our)return;veil=v;if(v)mode='steps';if(!quiet)drawAll()}
+function resetAll(){our=null;clearNull();clearStudies();veil=false;mode='steps';drawAll()}
 const bEl=document.getElementById('beta'), nEl=document.getElementById('n');
-bEl.addEventListener('input',()=>{trueB=+bEl.value;genCloud();resetAll()});
-nEl.addEventListener('input',()=>{N=+nEl.value;df=N-2;CRIT=tCrit(df,0.05);resetAll()});
+document.getElementById('bOur').addEventListener('click',()=>{if(running)return;drawOur();drawAll()});
+document.getElementById('bStata').addEventListener('click',()=>{if(running)return;useStata();drawAll()});
+document.getElementById('bN1').addEventListener('click',()=>{if(running||!our)return;veil=false;mode='steps';drawNull();drawAll()});
+document.getElementById('bN1000').addEventListener('click',()=>{if(running||!our)return;veil=false;mode='steps';animate(1000,drawNull)});
+document.getElementById('bP').addEventListener('click',()=>{if(running||!our||!nullT.length)return;veil=false;mode='steps';showP=true;drawAll()});
+document.getElementById('bVeil').addEventListener('click',()=>{if(!running)setVeil(!veil)});
+document.getElementById('bStart').addEventListener('click',()=>{if(!running)resetAll()});
+document.getElementById('b100').addEventListener('click',()=>{if(running)return;veil=false;mode='studies';animate(100,drawStudy)});
+document.getElementById('b1000').addEventListener('click',()=>{if(running)return;veil=false;mode='studies';animate(1000,drawStudy)});
+document.getElementById('bReset').addEventListener('click',()=>{if(running)return;clearStudies();mode='steps';drawAll()});
+bEl.addEventListener('input',()=>{if(running)return;trueB=+bEl.value;genClouds();resetAll()});
+nEl.addEventListener('input',()=>{if(running)return;N=+nEl.value;df=N-2;CRIT=tCrit(df,0.05);resetAll()});
 window.addEventListener('resize',drawAll);
 
-// ---------- init (?beta=0.046&auto=1000 or ?stata for screenshots) ----------
+// ---------- init (for screenshots: ?beta=0&auto=1000, ?stata, ?step=1|2|3, ?veil) ----------
 const q=new URLSearchParams(location.search);
 if(q.has('beta')){trueB=+q.get('beta');bEl.value=trueB}
-genCloud();
-if(q.has('auto'))for(let i=0;i<(+q.get('auto')||0);i++)drawSample();
-if(q.has('stata')){loadStata();setVeil(true,true)}
+genClouds();
+if(q.has('auto')){mode='studies';for(let i=0;i<(+q.get('auto')||0);i++)drawStudy()}
+if(q.has('stata'))useStata();
+if(q.has('step')){const s=+q.get('step');if(!our)drawOur();if(s>=2)for(let i=0;i<1000;i++)drawNull();if(s>=3)showP=true}
+if(q.has('veil')&&our)veil=true;
 drawAll();
 </script>
 <script>
